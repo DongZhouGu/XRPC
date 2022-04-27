@@ -1,0 +1,7 @@
+/xrpc-test-client/target/
+/xrpc-client/target/
+/xrpc-common/target/
+/xprc-server/target/
+/xrpc-test-server/target/
+/logs/
+/.idea/
