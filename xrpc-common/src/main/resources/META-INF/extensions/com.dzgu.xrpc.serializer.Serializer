@@ -1,0 +1,3 @@
+hessian=com.dzgu.xrpc.serializer.hessian.HessianSerializer
+kryo=com.dzgu.xrpc.serializer.kryo.KryoSerializer
+protostuff=com.dzgu.xrpc.serializer.protostuff.ProtostuffSerializer

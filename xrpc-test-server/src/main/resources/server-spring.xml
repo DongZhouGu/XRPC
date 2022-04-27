@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--scan service package-->
+    <context:component-scan base-package="service"/>
+
+<!--    <context:property-placeholder location="classpath:xrpc.properties"/>-->
+
+<!--    <bean id="serviceRegistry" class="com.netty.rpc.server.registry.ServiceRegistry">-->
+<!--        <constructor-arg name="registryAddress" value="${registry.address}"/>-->
+<!--    </bean>-->
+
+    <bean id="rpcServer" class="com.dzgu.xrpc.server.RpcServer" ></bean>
+
+</beans>
