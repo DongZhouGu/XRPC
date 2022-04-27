@@ -9,7 +9,7 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>xprc-server</module>
+        <module>xrpc-server</module>
         <module>xrpc-common</module>
         <module>xrpc-client</module>
         <module>xrpc-test-server</module>
