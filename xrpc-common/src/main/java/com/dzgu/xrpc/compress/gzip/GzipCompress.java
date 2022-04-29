@@ -12,7 +12,7 @@ import java.util.zip.GZIPOutputStream;
 import static com.dzgu.xrpc.config.enums.CompressTypeEnum.GZIP;
 
 /**
- * @description:
+ * @description: Gzip压缩算法
  * @Author： dzgu
  * @Date： 2022/4/22 19:07
  */

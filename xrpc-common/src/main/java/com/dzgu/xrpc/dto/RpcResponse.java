@@ -2,26 +2,24 @@ package com.dzgu.xrpc.dto;
 
 import com.dzgu.xrpc.config.enums.RpcResponseCodeEnum;
 import com.dzgu.xrpc.serializer.Serializer;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 
 /**
- * @description:
+ * @description: 消息返回dto
  * @Author： dzgu
  * @Date： 2022/4/22 17:16
  */
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
+@Builder
 @ToString
-@Accessors(chain = true)
 public class RpcResponse<T> implements Serializable {
     private static final long serialVersionUID = 715745410605631233L;
-
     private String requestId;
     /**
      * response code

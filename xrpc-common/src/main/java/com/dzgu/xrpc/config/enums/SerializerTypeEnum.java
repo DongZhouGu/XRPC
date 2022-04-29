@@ -12,11 +12,8 @@ import lombok.Getter;
 @Getter
 public enum SerializerTypeEnum {
     HESSIAN((byte) 1, "hessian"),
-
     KRYO((byte) 2, "kryo"),
-
-    PROTOSTUFF((byte) 2, "protostuff");
-
+    PROTOSTUFF((byte) 3, "protostuff");
 
     private final byte code;
     private final String name;

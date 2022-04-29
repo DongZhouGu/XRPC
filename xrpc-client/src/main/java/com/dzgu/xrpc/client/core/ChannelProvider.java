@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @description:
+ * @description: channel复用
  * @Author： dzgu
  * @Date： 2022/4/25 9:03
  */

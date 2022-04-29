@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.net.InetSocketAddress;
 
 /**
- * @description:
+ * @description: Netty客户端业务逻辑
  * @Author： dzgu
  * @Date： 2022/4/25 17:25
  */
@@ -32,7 +32,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<RpcMessage> 
     }
 
     /**
-     * Read the message transmitted by the server
+     * 从服务端读到消息时的业务逻辑
      */
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, RpcMessage rpcMessage) throws Exception {
@@ -42,12 +42,14 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<RpcMessage> 
             log.info("heart receive[{}]", rpcMessage.getData());
         } else if (messageType == RpcConstants.RESPONSE_TYPE) {
             RpcResponse<Object> rpcResponse = (RpcResponse<Object>) rpcMessage.getData();
-            // TODO 异步调用
+            // 调用结果相应 绑定到对应的请求
             pendingRpcRequests.complete(rpcResponse);
         }
     }
 
-    // 心跳发送
+    /**
+     * 当5秒内没有主动远程调用，也就是没有写事件发生时候，触发userEventTriggered主动写并发送心跳数据包
+     */
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
@@ -68,7 +70,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<RpcMessage> 
     }
 
     /**
-     * Called when an exception occurs in processing a client message
+     * 客户端异常捕获，并关闭连接
      */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {

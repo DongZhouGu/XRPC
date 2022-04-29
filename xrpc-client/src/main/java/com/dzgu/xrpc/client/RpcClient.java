@@ -3,7 +3,6 @@ package com.dzgu.xrpc.client;
 import com.dzgu.xrpc.annotation.RpcAutowired;
 import com.dzgu.xrpc.client.core.NettyClient;
 import com.dzgu.xrpc.client.discover.ServiceDiscovery;
-import com.dzgu.xrpc.client.proxy.ObjectProxy;
 import com.dzgu.xrpc.extension.ExtensionLoader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -13,10 +12,11 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Proxy;
+
+import static com.dzgu.xrpc.client.proxy.ObjectProxy.createService;
 
 /**
- * @description:
+ * @description: 注入Spring
  * @Author： dzgu
  * @Date： 2022/4/24 19:17
  */
@@ -30,13 +30,7 @@ public class RpcClient implements ApplicationContextAware, DisposableBean {
         this.serviceDiscovery = ExtensionLoader.getExtensionLoader(ServiceDiscovery.class).getExtension("zk");
     }
 
-    public static <T, P> T createService(Class<T> interfaceClass, String version) {
-        return (T) Proxy.newProxyInstance(
-                interfaceClass.getClassLoader(),
-                new Class<?>[]{interfaceClass},
-                new ObjectProxy<T>(interfaceClass, version)
-        );
-    }
+
 
     public void stop() {
         serviceDiscovery.stop();

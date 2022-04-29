@@ -13,6 +13,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Slf4j
 public class ServiceProvider {
+    /**
+     *  服务缓存
+     */
     private final Map<String, Object> serviceMap;
 
     public ServiceProvider() {

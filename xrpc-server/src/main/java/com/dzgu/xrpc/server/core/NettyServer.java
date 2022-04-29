@@ -20,6 +20,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,9 +28,10 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 /**
- * @description: Netty服务
+ * @description: Netty服务器实现
  * @Author： dzgu
  * @Date： 2022/4/22 0:06
  */
@@ -70,7 +72,9 @@ public class NettyServer {
 
             @Override
             public void run() {
-                NioEventLoopGroup bossGroup = new NioEventLoopGroup();
+                // 负责服务器通道新连接的IO事件的监听
+                NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);
+                // 负责传输通道的IO事件的处理, 无参数的构造函数默认最大可用的CPU处理器数量 的2倍
                 NioEventLoopGroup workerGroup = new NioEventLoopGroup();
                 try {
                     ServerBootstrap bootstrap = new ServerBootstrap();
@@ -86,13 +90,14 @@ public class NettyServer {
                             .childHandler(new ChannelInitializer<NioSocketChannel>() {
                                 @Override
                                 protected void initChannel(NioSocketChannel ch) throws Exception {
-                                    // 心跳
-                                    ch.pipeline().addLast(new IMIdleStateHandler());
+                                    // 心跳,空闲检测
+                                    ch.pipeline().addLast(new IdleStateHandler(15, 0, 0, TimeUnit.SECONDS));
                                     // 处理粘包半包
                                     ch.pipeline().addLast(new Spliter());
                                     ch.pipeline().addLast(new RpcDecoder());
                                     ch.pipeline().addLast(new RpcEncoder());
                                     ch.pipeline().addLast(serviceHandlerGroup, new NettyServerHandler());
+
                                 }
                             });
                     // 绑定端口，同步等待绑定成功
@@ -104,7 +109,7 @@ public class NettyServer {
                         log.warn("ServiceRegistry cannot be found and started");
                     }
                     log.info("Netty Server started on address {}", serverAddress);
-                    // 不会立即执行 finaaly，而阻塞在这里，等待服务端监听端口关闭
+                    // 不会立即执行 finally，而阻塞在这里，等待服务端监听端口关闭
                     f.channel().closeFuture().sync();
                 } catch (Exception e) {
                     if (e instanceof InterruptedException) {
@@ -115,6 +120,8 @@ public class NettyServer {
                 } finally {
                     try {
                         serviceRegistry.unregisterService(serverAddress);
+                        // 关闭EventLoopGroup
+                        // 释放掉所有资源，包括创建的反应器线程
                         workerGroup.shutdownGracefully();
                         bossGroup.shutdownGracefully();
                     } catch (Exception ex) {

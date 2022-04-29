@@ -18,7 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * @description:
+ * @description: Netty 服务端业务逻辑
  * @Author： dzgu
  * @Date： 2022/4/22 19:59
  */
@@ -34,12 +34,13 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<RpcMessage> 
     protected void channelRead0(ChannelHandlerContext ctx, RpcMessage rpcMessage) throws Exception {
         log.info("server receive msg: [{}] ", rpcMessage);
         byte messageType = rpcMessage.getMessageType();
+        // 如果是心跳消息，回复pong
         if (messageType == RpcConstants.HEARTBEAT_REQUEST_TYPE) {
             rpcMessage.setMessageType(RpcConstants.HEARTBEAT_RESPONSE_TYPE);
             rpcMessage.setData(RpcConstants.PONG);
         } else {
             RpcRequest rpcRequest = (RpcRequest) rpcMessage.getData();
-            // 反射执行方法
+            // 根据请求的参数，找到对应的服务，反射执行方法
             Object result = handle(rpcRequest);
             log.info(String.format("server get result: %s", result.toString()));
             rpcMessage.setMessageType(RpcConstants.RESPONSE_TYPE);
@@ -64,7 +65,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<RpcMessage> 
                 }
             }
         });
-
     }
 
     @Override

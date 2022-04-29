@@ -7,15 +7,22 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @description:
+ * @description: 未收到回复的请求
  * @Author： dzgu
  * @Date： 2022/4/25 22:01
  */
 public class PendingRpcRequests {
-    public static final Map<String, CompletableFuture<RpcResponse<Object>>> PENDING_RESPONSE_FUTURES=new ConcurrentHashMap<>();
+    public static final Map<String, CompletableFuture<RpcResponse<Object>>> PENDING_RESPONSE_FUTURES = new ConcurrentHashMap<>();
+
     public void put(String requestId, CompletableFuture<RpcResponse<Object>> future) {
         PENDING_RESPONSE_FUTURES.put(requestId, future);
     }
+
+    /**
+     * 将请求与调用结果响应绑定
+     *
+     * @param rpcResponse 收到服务端发来的调用结果
+     */
     public void complete(RpcResponse<Object> rpcResponse) {
         CompletableFuture<RpcResponse<Object>> future = PENDING_RESPONSE_FUTURES.remove(rpcResponse.getRequestId());
         if (null != future) {

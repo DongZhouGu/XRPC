@@ -3,7 +3,7 @@ package com.dzgu.xrpc.dto;
 import lombok.*;
 
 /**
- * @description:
+ * @description: 消息头+消息体
  * @Author： dzgu
  * @Date： 2022/4/22 16:56
  */
@@ -14,7 +14,6 @@ import lombok.*;
 @Builder
 @ToString
 public class RpcMessage {
-
     /**
      * rpc message type
      */
@@ -35,5 +34,4 @@ public class RpcMessage {
      * request data
      */
     private Object data;
-
 }

@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -30,10 +31,24 @@ public class ObjectProxy<T> implements InvocationHandler {
         this.version = version;
     }
 
+    /**
+     * 获取被调用服务的动态代理类
+     */
+    public static <T> T createService(Class<T> interfaceClass, String version) {
+        return (T) Proxy.newProxyInstance(
+                interfaceClass.getClassLoader(),
+                new Class<?>[]{interfaceClass},
+                new ObjectProxy<T>(interfaceClass, version)
+        );
+    }
+    /**
+     *  客户端主要逻辑，包括发送请求，相应结果与请求的绑定
+     *
+     */
     @SneakyThrows
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        log.info("invoked method: [{}]", method.getName());
+        log.info("client invoked method: [{}]", method.getName());
         RpcRequest rpcRequest = RpcRequest.builder()
                 .methodName(method.getName())
                 .parameters(args)
@@ -42,7 +57,10 @@ public class ObjectProxy<T> implements InvocationHandler {
                 .requestId(UUID.randomUUID().toString())
                 .version(version)
                 .build();
+        // 向服务端发送请求
         CompletableFuture<RpcResponse<Object>> completableFuture = (CompletableFuture<RpcResponse<Object>>) NettyClient.getInstance().sendRequest(rpcRequest);
+        // 阻塞等待调用请求的结果，当 Netty Client 收到对应请求的回复时，future.complete（response）,完成相应
+        // TODO 异步调用
         RpcResponse<Object> rpcResponse = completableFuture.get();
         this.check(rpcResponse, rpcRequest);
         return rpcResponse.getData();

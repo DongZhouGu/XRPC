@@ -6,7 +6,7 @@ import lombok.experimental.Accessors;
 import java.io.Serializable;
 
 /**
- * @description:
+ * @description: 消息请求dto
  * @Author： dzgu
  * @Date： 2022/4/22 15:29
  */
@@ -16,8 +16,7 @@ import java.io.Serializable;
 @Builder
 @ToString
 public class RpcRequest implements Serializable {
-    private static final long serialVersionUID = 1905122041950251207L;
-
+    private static final long serialVersionUID = 2176648719840392878L;
     private String requestId;
     private String className;
     private String methodName;
