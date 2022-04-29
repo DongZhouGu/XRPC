@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * @description:
+ * @description: 序列化类型枚举
  * @Author： dzgu
  * @Date： 2022/4/22 19:15
  */

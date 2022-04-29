@@ -15,6 +15,7 @@ import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 
 /**
  * @description: Netty客户端业务逻辑
@@ -25,10 +26,13 @@ import java.net.InetSocketAddress;
 public class NettyClientHandler extends SimpleChannelInboundHandler<RpcMessage> {
     private final PendingRpcRequests pendingRpcRequests;
     private final NettyClient nettyClient;
+    private final ChannelProvider channelProvider;
+
 
     public NettyClientHandler() {
         this.pendingRpcRequests = SingletonFactory.getInstance(PendingRpcRequests.class);
-        this.nettyClient = SingletonFactory.getInstance(NettyClient.class);
+        this.nettyClient = NettyClient.getInstance();
+        this.channelProvider = SingletonFactory.getInstance(ChannelProvider.class);
     }
 
     /**
@@ -70,12 +74,14 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<RpcMessage> 
     }
 
     /**
-     * 客户端异常捕获，并关闭连接
+     * 客户端异常捕获，并关闭连接, 从channel Map中删除channel, 下次调用自动重连server端
      */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         log.error("client catch exception：", cause);
         cause.printStackTrace();
+        SocketAddress socketAddress = ctx.channel().remoteAddress();
+        channelProvider.remove(socketAddress.toString());
         ctx.close();
     }
 }

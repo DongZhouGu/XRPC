@@ -53,7 +53,7 @@ public class Spliter extends LengthFieldBasedFrameDecoder {
         ByteBuf frame = (ByteBuf) decoded;
         if (frame.readableBytes() >= RpcConstants.HEAD_LENGTH) {
             //拒绝非本协议连接
-            if(!checkMagicNumberAndVersion(in)){
+            if(!checkMagicNumberAndVersion(frame)){
                 ctx.channel().close();
                 return null;
             }
@@ -66,11 +66,10 @@ public class Spliter extends LengthFieldBasedFrameDecoder {
      */
     private boolean checkMagicNumberAndVersion(ByteBuf in) {
         // 读取魔数
-        int len = RpcConstants.MAGIC_NUMBER.length;
-        byte[] bytes = new byte[len];
+        byte[] bytes = new byte[MAGIC_LENGTH];
         in.readBytes(bytes);
         // 比较魔数是否符合规定，不符合抛出异常
-        for (int i = 0; i < len; i++) {
+        for (int i = 0; i < MAGIC_LENGTH; i++) {
             if (bytes[i] != RpcConstants.MAGIC_NUMBER[i]) {
                 log.error("Unknown magic code: " + Arrays.toString(bytes));
                 return false;

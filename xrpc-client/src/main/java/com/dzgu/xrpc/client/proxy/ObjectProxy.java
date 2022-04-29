@@ -14,6 +14,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @description: 动态代理，调用一个方法时，实际调用它的代理方法
@@ -61,7 +62,7 @@ public class ObjectProxy<T> implements InvocationHandler {
         CompletableFuture<RpcResponse<Object>> completableFuture = (CompletableFuture<RpcResponse<Object>>) NettyClient.getInstance().sendRequest(rpcRequest);
         // 阻塞等待调用请求的结果，当 Netty Client 收到对应请求的回复时，future.complete（response）,完成相应
         // TODO 异步调用
-        RpcResponse<Object> rpcResponse = completableFuture.get();
+        RpcResponse<Object> rpcResponse = completableFuture.get(10, TimeUnit.SECONDS);
         this.check(rpcResponse, rpcRequest);
         return rpcResponse.getData();
 

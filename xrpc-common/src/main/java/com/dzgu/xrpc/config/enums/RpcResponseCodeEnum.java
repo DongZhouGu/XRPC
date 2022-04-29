@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 /**
- * @description:
+ * @description: RPC响应结果枚举
  * @Author： dzgu
  * @Date： 2022/4/22 23:40
  */

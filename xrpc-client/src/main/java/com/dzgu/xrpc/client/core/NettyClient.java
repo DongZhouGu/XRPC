@@ -28,9 +28,11 @@ import org.springframework.core.codec.Decoder;
 
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+import static com.dzgu.xrpc.config.RpcConstants.MAX_RETRY;
 import static com.dzgu.xrpc.config.RpcConstants.REQUEST_ID;
 
 /**
@@ -76,7 +78,7 @@ public class NettyClient {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new IdleStateHandler(0, 5, 0, TimeUnit.SECONDS));
+                        //ch.pipeline().addLast(new IdleStateHandler(0, 5, 0, TimeUnit.SECONDS));
                         ch.pipeline().addLast(new RpcEncoder());
                         ch.pipeline().addLast(new Spliter());
                         ch.pipeline().addLast(new RpcDecoder());
@@ -132,10 +134,13 @@ public class NettyClient {
      * @param inetSocketAddress 待连接scoket地址
      * @return: {@link Channel} 获取到的连接
      */
+    @SneakyThrows
     public Channel getChannel(InetSocketAddress inetSocketAddress) {
         Channel channel = channelProvider.get(inetSocketAddress);
         if (channel == null) {
-            channel = doConnect(inetSocketAddress);
+            // 阻塞等待，获取连接成功的channel
+            CompletableFuture<Channel> completableFuture = new CompletableFuture<>();
+            channel = doConnect(completableFuture,inetSocketAddress, MAX_RETRY).get();
             channelProvider.set(inetSocketAddress, channel);
         }
         return channel;
@@ -146,22 +151,24 @@ public class NettyClient {
      * 与服务端建立连接
      */
     @SneakyThrows
-    public Channel doConnect(InetSocketAddress inetSocketAddress) {
-        try {
-            CompletableFuture<Channel> completableFuture = new CompletableFuture<>();
-            bootstrap.connect(inetSocketAddress).addListener(future -> {
-                if (future.isSuccess()) {
-                    log.info("The client has connected [{}] successful!", inetSocketAddress.toString());
-                    completableFuture.complete(((ChannelFuture) future).channel());
-                } else {
-                    log.error("connect fail. address:", inetSocketAddress);
-                }
-            });
-            // 阻塞等待，获取连接成功的channel, 10s为获取到，报错
-            return completableFuture.get(10, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            throw new RpcException(inetSocketAddress + " connect fail.", e);
-        }
+    public CompletableFuture<Channel> doConnect(CompletableFuture<Channel> completableFuture,InetSocketAddress inetSocketAddress, int retry) {
+        bootstrap.connect(inetSocketAddress).addListener(future -> {
+            if (future.isSuccess()) {
+                log.info("The client has connected [{}] successful!", inetSocketAddress.toString());
+                completableFuture.complete(((ChannelFuture) future).channel());
+            } else if (retry == 0) {
+                log.error("the number of retries expired, connect fail. address:", inetSocketAddress);
+            } else {
+                // 当前是第几次重连
+                int now = MAX_RETRY - retry + 1;
+                // 本次重连的时间间隔
+                int delay = 1 << now;
+                log.warn("connect fail, attempt to reconnect. retry:" + now);
+                bootstrap.config().group().schedule(() ->
+                        doConnect(completableFuture,inetSocketAddress, retry - 1), delay, TimeUnit.SECONDS);
+            }
+        });
+        return completableFuture;
     }
 
     public void stop() {

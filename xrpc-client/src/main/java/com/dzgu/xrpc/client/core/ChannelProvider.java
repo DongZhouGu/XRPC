@@ -35,4 +35,8 @@ public class ChannelProvider {
     public void set(InetSocketAddress inetSocketAddress, Channel channel) {
         channelMap.put(inetSocketAddress.toString(), channel);
     }
+
+    public void remove(String address){
+        channelMap.remove(address);
+    }
 }

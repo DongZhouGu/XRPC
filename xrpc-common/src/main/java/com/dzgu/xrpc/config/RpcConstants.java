@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * @description:
+ * @description: RPC 常量
  * @Author： dzgu
  * @Date： 2022/4/22 16:20
  */
@@ -24,7 +24,7 @@ public interface RpcConstants {
     /**
      * 魔法数字长度
      */
-    int MAGIC_LENGTH = 2;
+    int MAGIC_LENGTH = 4;
 
     /**
      * 版本长度
@@ -47,4 +47,9 @@ public interface RpcConstants {
     String PING = "ping";
     String PONG = "pong";
     int MAX_FRAME_LENGTH = 8 * 1024 * 1024;
+    /**
+     *  客户端重连次数
+     */
+    int MAX_RETRY = 5;
+
 }
