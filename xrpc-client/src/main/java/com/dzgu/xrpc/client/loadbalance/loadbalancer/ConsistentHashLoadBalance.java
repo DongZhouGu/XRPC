@@ -24,7 +24,7 @@ public class ConsistentHashLoadBalance implements LoadBalance {
     @Override
     public String doSelect(List<String> serviceAddresses, RpcRequest rpcRequest) {
         int identityHashCode = System.identityHashCode(serviceAddresses);
-        // build rpc service name by rpcRequest
+        // build rpc com.dzgu.xprc.service name by rpcRequest
         String rpcServiceName = rpcRequest.getMethodName();
         ConsistentHashSelector selector = selectors.get(rpcServiceName);
         // check for updates

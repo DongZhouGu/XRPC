@@ -3,10 +3,9 @@ package com.dzgu.xrpc.server.core;
 import com.dzgu.xrpc.codec.RpcDecoder;
 import com.dzgu.xrpc.codec.RpcEncoder;
 import com.dzgu.xrpc.codec.Spliter;
-import com.dzgu.xrpc.config.enums.RpcConfigEnum;
+import com.dzgu.xrpc.consts.enums.RpcConfigEnum;
 import com.dzgu.xrpc.extension.ExtensionLoader;
 import com.dzgu.xrpc.server.registry.ServiceRegistry;
-import com.dzgu.xrpc.server.registry.zk.ZkServiceRegistry;
 import com.dzgu.xrpc.util.PropertiesFileUtil;
 import com.dzgu.xrpc.util.RuntimeUtil;
 import com.dzgu.xrpc.util.SingletonFactory;
@@ -22,6 +21,7 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
+import io.protostuff.Rpc;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetAddress;
@@ -47,6 +47,7 @@ public class NettyServer {
     public NettyServer() {
         this.serviceProvider = SingletonFactory.getInstance(ServiceProvider.class);
         this.serviceRegistry = ExtensionLoader.getExtensionLoader(ServiceRegistry.class).getExtension("zk");
+        this.serviceRegistry.setRegisterAddress("106.14.145.23:2181");
     }
 
     public static InetSocketAddress getServerAddress() {
@@ -68,7 +69,7 @@ public class NettyServer {
         thread = new Thread(new Runnable() {
             DefaultEventExecutorGroup serviceHandlerGroup = new DefaultEventExecutorGroup(
                     RuntimeUtil.cpus() * 2,
-                    ThreadPoolFactoryUtil.createThreadFactory("service-handler-group", false));
+                    ThreadPoolFactoryUtil.createThreadFactory("com.dzgu.xprc.service-handler-group", false));
 
             @Override
             public void run() {

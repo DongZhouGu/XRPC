@@ -1,7 +1,7 @@
 package com.dzgu.xrpc.compress.dummy;
 
 import com.dzgu.xrpc.compress.Compress;
-import com.dzgu.xrpc.config.enums.CompressTypeEnum;
+import com.dzgu.xrpc.consts.enums.CompressTypeEnum;
 
 /**
  * @description: 不使用压缩算法

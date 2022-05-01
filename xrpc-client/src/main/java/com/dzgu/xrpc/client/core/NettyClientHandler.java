@@ -1,8 +1,8 @@
 package com.dzgu.xrpc.client.core;
 
-import com.dzgu.xrpc.config.RpcConstants;
-import com.dzgu.xrpc.config.enums.CompressTypeEnum;
-import com.dzgu.xrpc.config.enums.SerializerTypeEnum;
+import com.dzgu.xrpc.consts.RpcConstants;
+import com.dzgu.xrpc.consts.enums.CompressTypeEnum;
+import com.dzgu.xrpc.consts.enums.SerializerTypeEnum;
 import com.dzgu.xrpc.dto.RpcMessage;
 import com.dzgu.xrpc.dto.RpcResponse;
 import com.dzgu.xrpc.util.SingletonFactory;
@@ -25,14 +25,16 @@ import java.net.SocketAddress;
 @Slf4j
 public class NettyClientHandler extends SimpleChannelInboundHandler<RpcMessage> {
     private final PendingRpcRequests pendingRpcRequests;
-    private final NettyClient nettyClient;
-    private final ChannelProvider channelProvider;
-
+    protected volatile Channel channel;
 
     public NettyClientHandler() {
         this.pendingRpcRequests = SingletonFactory.getInstance(PendingRpcRequests.class);
-        this.nettyClient = NettyClient.getInstance();
-        this.channelProvider = SingletonFactory.getInstance(ChannelProvider.class);
+    }
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        log.debug("Connect to server successfully:{}", ctx);
+        this.channel = ctx.channel();
     }
 
     /**
@@ -60,7 +62,6 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<RpcMessage> 
             IdleState state = ((IdleStateEvent) evt).state();
             if (state == IdleState.WRITER_IDLE) {
                 log.info("write idle happen [{}]", ctx.channel().remoteAddress());
-                Channel channel = nettyClient.getChannel((InetSocketAddress) ctx.channel().remoteAddress());
                 RpcMessage rpcMessage = new RpcMessage();
                 rpcMessage.setCodec(SerializerTypeEnum.PROTOSTUFF.getCode());
                 rpcMessage.setCompress(CompressTypeEnum.GZIP.getCode());
@@ -80,8 +81,6 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<RpcMessage> 
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         log.error("client catch exception：", cause);
         cause.printStackTrace();
-        SocketAddress socketAddress = ctx.channel().remoteAddress();
-        channelProvider.remove(socketAddress.toString());
         ctx.close();
     }
 }

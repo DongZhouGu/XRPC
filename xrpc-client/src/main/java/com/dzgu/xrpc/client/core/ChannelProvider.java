@@ -13,14 +13,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Date： 2022/4/25 9:03
  */
 public class ChannelProvider {
-    private final Map<String, Channel> channelMap;
+    private final Map<InetSocketAddress, Channel> channelMap;
 
     public ChannelProvider() {
         channelMap = new ConcurrentHashMap<>();
     }
 
-    public Channel get(InetSocketAddress inetSocketAddress) {
-        String key = inetSocketAddress.toString();
+    public Channel get(InetSocketAddress key) {
         if (channelMap.containsKey(key)) {
             Channel channel = channelMap.get(key);
             if (channel != null && channel.isActive()) {
@@ -33,10 +32,10 @@ public class ChannelProvider {
     }
 
     public void set(InetSocketAddress inetSocketAddress, Channel channel) {
-        channelMap.put(inetSocketAddress.toString(), channel);
+        channelMap.put(inetSocketAddress, channel);
     }
 
-    public void remove(String address){
-        channelMap.remove(address);
+    public void remove(InetSocketAddress inetSocketAddress){
+        channelMap.remove(inetSocketAddress);
     }
 }

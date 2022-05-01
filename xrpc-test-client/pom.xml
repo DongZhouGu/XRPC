@@ -3,12 +3,12 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>XRpc</artifactId>
-        <groupId>com.dzgu.xrpc</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.5.4</version>
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>xrpc-test-client</artifactId>
 
     <properties>
@@ -18,11 +18,6 @@
     <dependencies>
         <dependency>
             <groupId>com.dzgu.xrpc</groupId>
-            <artifactId>xrpc-common</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.dzgu.xrpc</groupId>
             <artifactId>xrpc-client</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
@@ -30,8 +25,21 @@
             <groupId>com.dzgu.xrpc</groupId>
             <artifactId>xrpc-common</artifactId>
             <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>2.5.4</version>
+        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.junit.jupiter</groupId>-->
+<!--            <artifactId>junit-jupiter</artifactId>-->
+<!--            <version>5.8.2</version>-->
+<!--        </dependency>-->
     </dependencies>
 
 </project>

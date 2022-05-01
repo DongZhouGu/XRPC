@@ -1,9 +1,7 @@
 package com.dzgu.xrpc.dto;
 
-import com.dzgu.xrpc.config.enums.RpcResponseCodeEnum;
-import com.dzgu.xrpc.serializer.Serializer;
+import com.dzgu.xrpc.consts.enums.RpcResponseCodeEnum;
 import lombok.*;
-import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 

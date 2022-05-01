@@ -1,6 +1,6 @@
 package com.dzgu.xrpc.exception;
 
-import com.dzgu.xrpc.config.enums.RpcErrorMessageEnum;
+import com.dzgu.xrpc.consts.enums.RpcErrorMessageEnum;
 
 /**
  * @description:

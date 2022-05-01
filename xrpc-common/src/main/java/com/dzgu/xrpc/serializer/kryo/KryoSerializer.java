@@ -1,6 +1,6 @@
 package com.dzgu.xrpc.serializer.kryo;
 
-import com.dzgu.xrpc.config.enums.SerializerTypeEnum;
+import com.dzgu.xrpc.consts.enums.SerializerTypeEnum;
 import com.dzgu.xrpc.dto.RpcRequest;
 import com.dzgu.xrpc.dto.RpcResponse;
 import com.dzgu.xrpc.serializer.Serializer;

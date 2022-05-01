@@ -1,9 +1,6 @@
 package com.dzgu.xrpc.zookeeper;
 
-import com.dzgu.xrpc.config.enums.RpcConfigEnum;
-import com.dzgu.xrpc.util.PropertiesFileUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.imps.CuratorFrameworkState;
@@ -15,16 +12,10 @@ import org.apache.zookeeper.CreateMode;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @description:
- * @Author： dzgu
- * @Date： 2022/4/25 21:53
- */
 @Slf4j
 public class CuratorUtils {
     private static final int BASE_SLEEP_TIME = 1000;
@@ -33,7 +24,6 @@ public class CuratorUtils {
     private static final Map<String, List<String>> SERVICE_ADDRESS_MAP = new ConcurrentHashMap<>();
     private static final Set<String> REGISTERED_PATH_SET = ConcurrentHashMap.newKeySet();
     private static CuratorFramework zkClient;
-    private static final String DEFAULT_ZOOKEEPER_ADDRESS = "127.0.0.1:2181";
 
     private CuratorUtils() {
     }
@@ -48,7 +38,6 @@ public class CuratorUtils {
             if (REGISTERED_PATH_SET.contains(path) || zkClient.checkExists().forPath(path) != null) {
                 log.info("The node already exists. The node is:[{}]", path);
             } else {
-                //eg: /my-rpc/github.javaguide.HelloService/127.0.0.1:9999
                 zkClient.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT).forPath(path);
                 log.info("The node was created successfully. The node is:[{}]", path);
             }
@@ -61,7 +50,7 @@ public class CuratorUtils {
     /**
      * Gets the children under a node
      *
-     * @param rpcServiceName rpc service name eg:github.javaguide.HelloServicetest2version1
+     * @param rpcServiceName rpc com.dzgu.xprc.service name eg:github.javaguide.HelloServicetest2version1
      * @return All child nodes under the specified node
      */
     public static List<String> getChildrenNodes(CuratorFramework zkClient, String rpcServiceName) {
@@ -96,10 +85,7 @@ public class CuratorUtils {
         log.info("All registered services on the server are cleared:[{}]", REGISTERED_PATH_SET.toString());
     }
 
-    public static CuratorFramework getZkClient() {
-        // check if user has set zk address
-        Properties properties = PropertiesFileUtil.readPropertiesFile(RpcConfigEnum.RPC_CONFIG_PATH.getPropertyValue());
-        String zookeeperAddress = properties != null && properties.getProperty(RpcConfigEnum.ZK_ADDRESS.getPropertyValue()) != null ? properties.getProperty(RpcConfigEnum.ZK_ADDRESS.getPropertyValue()) : DEFAULT_ZOOKEEPER_ADDRESS;
+    public static CuratorFramework getZkClient(String zookeeperAddress) {
         // if zkClient has been started, return directly
         if (zkClient != null && zkClient.getState() == CuratorFrameworkState.STARTED) {
             return zkClient;
@@ -132,7 +118,7 @@ public class CuratorUtils {
     /**
      * Registers to listen for changes to the specified node
      *
-     * @param rpcServiceName rpc service name eg:github.javaguide.HelloServicetest2version
+     * @param rpcServiceName rpc com.dzgu.xprc.service name eg:github.javaguide.HelloServicetest2version
      */
     private static void registerWatcher(String rpcServiceName, CuratorFramework zkClient) throws Exception {
         String servicePath = ZK_REGISTER_ROOT_PATH + "/" + rpcServiceName;

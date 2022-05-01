@@ -1,6 +1,6 @@
 package com.dzgu.xrpc.zookeeper;
 
-import com.dzgu.xrpc.config.ZkConstants;
+import com.dzgu.xrpc.consts.ZkConstants;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;

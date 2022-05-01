@@ -21,7 +21,13 @@ public class ZkServiceRegistry implements ServiceRegistry {
     private CuratorFramework zkClient;
 
     public ZkServiceRegistry() {
-        this.zkClient = CuratorUtils.getZkClient();
+    }
+
+
+    @Override
+    public void setRegisterAddress(String registerAddress) {
+        this.zkClient=CuratorUtils.getZkClient(registerAddress);
+
     }
 
     @Override

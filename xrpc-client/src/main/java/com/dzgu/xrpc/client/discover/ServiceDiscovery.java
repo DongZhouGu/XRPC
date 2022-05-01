@@ -1,9 +1,11 @@
 package com.dzgu.xrpc.client.discover;
 
+import com.dzgu.xrpc.client.loadbalance.LoadBalance;
 import com.dzgu.xrpc.dto.RpcRequest;
 import com.dzgu.xrpc.extension.SPI;
 
 import java.net.InetSocketAddress;
+import java.util.List;
 
 /**
  * @description:
@@ -12,6 +14,10 @@ import java.net.InetSocketAddress;
  */
 @SPI
 public interface ServiceDiscovery {
-    public InetSocketAddress lookupService(RpcRequest rpcRequest);
+
+    public void setRegisterAddress(String registerAddress);
+
+    public List<String> lookupService(String serviceKey);
+
     public void stop();
 }

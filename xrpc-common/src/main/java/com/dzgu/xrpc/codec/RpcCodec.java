@@ -1,9 +1,9 @@
 package com.dzgu.xrpc.codec;
 
 import com.dzgu.xrpc.compress.Compress;
-import com.dzgu.xrpc.config.RpcConstants;
-import com.dzgu.xrpc.config.enums.CompressTypeEnum;
-import com.dzgu.xrpc.config.enums.SerializerTypeEnum;
+import com.dzgu.xrpc.consts.RpcConstants;
+import com.dzgu.xrpc.consts.enums.CompressTypeEnum;
+import com.dzgu.xrpc.consts.enums.SerializerTypeEnum;
 import com.dzgu.xrpc.dto.RpcMessage;
 import com.dzgu.xrpc.dto.RpcRequest;
 import com.dzgu.xrpc.dto.RpcResponse;
@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.dzgu.xrpc.config.RpcConstants.*;
+import static com.dzgu.xrpc.consts.RpcConstants.*;
 
 /**
  * 自定义协议

@@ -12,12 +12,15 @@ import java.util.Map;
  */
 @SPI
 public interface ServiceRegistry {
-    void registerServiceMap(InetSocketAddress serverAddress, Map<String, Object> serviceMap) ;
+     void setRegisterAddress(String registerAddress);
+
+    void registerServiceMap(InetSocketAddress serverAddress, Map<String, Object> serviceMap);
+
     /**
-     * register service
+     * register com.dzgu.xprc.service
      *
-     * @param rpcServiceName    rpc service name
-     * @param inetSocketAddress service address
+     * @param rpcServiceName    rpc com.dzgu.xprc.service name
+     * @param inetSocketAddress com.dzgu.xprc.service address
      */
     void registerService(String rpcServiceName, InetSocketAddress inetSocketAddress);
 

@@ -1,6 +1,6 @@
 package com.dzgu.xrpc.compress;
 
-import com.dzgu.xrpc.config.enums.CompressTypeEnum;
+import com.dzgu.xrpc.consts.enums.CompressTypeEnum;
 import com.dzgu.xrpc.extension.SPI;
 
 /**

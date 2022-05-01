@@ -2,7 +2,7 @@ package com.dzgu.xrpc.serializer.hessian;
 
 import com.caucho.hessian.io.HessianInput;
 import com.caucho.hessian.io.HessianOutput;
-import com.dzgu.xrpc.config.enums.SerializerTypeEnum;
+import com.dzgu.xrpc.consts.enums.SerializerTypeEnum;
 import com.dzgu.xrpc.serializer.Serializer;
 import com.sun.xml.internal.ws.encoding.soap.SerializationException;
 

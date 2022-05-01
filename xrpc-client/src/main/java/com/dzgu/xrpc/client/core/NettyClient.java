@@ -1,13 +1,12 @@
 package com.dzgu.xrpc.client.core;
 
-import cn.hutool.core.util.StrUtil;
 import com.dzgu.xrpc.client.discover.ServiceDiscovery;
 import com.dzgu.xrpc.codec.RpcDecoder;
 import com.dzgu.xrpc.codec.RpcEncoder;
 import com.dzgu.xrpc.codec.Spliter;
-import com.dzgu.xrpc.config.RpcConstants;
-import com.dzgu.xrpc.config.enums.CompressTypeEnum;
-import com.dzgu.xrpc.config.enums.SerializerTypeEnum;
+import com.dzgu.xrpc.consts.RpcConstants;
+import com.dzgu.xrpc.consts.enums.CompressTypeEnum;
+import com.dzgu.xrpc.consts.enums.SerializerTypeEnum;
 import com.dzgu.xrpc.dto.RpcMessage;
 import com.dzgu.xrpc.dto.RpcRequest;
 import com.dzgu.xrpc.dto.RpcResponse;
@@ -24,16 +23,14 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.codec.Decoder;
 
 import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-import static com.dzgu.xrpc.config.RpcConstants.MAX_RETRY;
-import static com.dzgu.xrpc.config.RpcConstants.REQUEST_ID;
+import static com.dzgu.xrpc.consts.RpcConstants.MAX_RETRY;
+import static com.dzgu.xrpc.consts.RpcConstants.REQUEST_ID;
+import static com.dzgu.xrpc.consts.enums.RpcErrorMessageEnum.SERVICE_INVOCATION_FAILURE;
 
 /**
  * @description: Netty 客户端
@@ -42,26 +39,10 @@ import static com.dzgu.xrpc.config.RpcConstants.REQUEST_ID;
  */
 @Slf4j
 public class NettyClient {
-    private final ServiceDiscovery serviceDiscovery;
     private final ChannelProvider channelProvider;
     private final Bootstrap bootstrap;
     private final EventLoopGroup eventLoopGroup;
     private final PendingRpcRequests pendingRpcRequests;
-    private static volatile NettyClient instance = null;
-
-    /**
-     * 线程安全的懒汉单例
-     */
-    public static NettyClient getInstance() {
-        if (instance == null) {
-            synchronized (NettyClient.class) {
-                if (instance == null) {
-                    instance = new NettyClient();
-                }
-            }
-        }
-        return instance;
-    }
 
     public NettyClient() {
         eventLoopGroup = new NioEventLoopGroup();
@@ -78,7 +59,7 @@ public class NettyClient {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        //ch.pipeline().addLast(new IdleStateHandler(0, 5, 0, TimeUnit.SECONDS));
+                        ch.pipeline().addLast(new IdleStateHandler(0, 5, 0, TimeUnit.SECONDS));
                         ch.pipeline().addLast(new RpcEncoder());
                         ch.pipeline().addLast(new Spliter());
                         ch.pipeline().addLast(new RpcDecoder());
@@ -86,30 +67,27 @@ public class NettyClient {
                     }
                 });
         this.channelProvider = SingletonFactory.getInstance(ChannelProvider.class);
-        this.serviceDiscovery = ExtensionLoader.getExtensionLoader(ServiceDiscovery.class).getExtension("zk");
         this.pendingRpcRequests = SingletonFactory.getInstance(PendingRpcRequests.class);
     }
 
 
-    public Object sendRequest(RpcRequest rpcRequest) {
+    public RpcResponse<Object> sendRequest(RpcMessage rpcMessage, String targetServiceUrl) {
+        String[] socketAddressArray = targetServiceUrl.split(":");
+        String host = socketAddressArray[0];
+        int port = Integer.parseInt(socketAddressArray[1]);
+        InetSocketAddress remoteaddress = new InetSocketAddress(host, port);
         // 构造返回Future
         CompletableFuture<RpcResponse<Object>> resultFuture = new CompletableFuture<>();
-        // 通过负载均衡获取服务端地址
-        InetSocketAddress inetSocketAddress = serviceDiscovery.lookupService(rpcRequest);
         // Channel复用，获取之前连接过的或者断线重连得Netty Channel
-        Channel channel = getChannel(inetSocketAddress);
-        if (channel.isActive()) {
+        Channel channel = getChannel(remoteaddress);
+        RpcResponse<Object> rpcResponse = null;
+        try {
             // 将请求放入未完成请求的Map缓存中,key为请求的唯一ID, value存放异步回调Future
-            pendingRpcRequests.put(rpcRequest.getRequestId(), resultFuture);
-            RpcMessage rpcMessage = RpcMessage.builder().data(rpcRequest)
-                    .codec(SerializerTypeEnum.HESSIAN.getCode())
-                    .compress(CompressTypeEnum.GZIP.getCode())
-                    .requestId(REQUEST_ID.getAndIncrement())
-                    .messageType(RpcConstants.REQUEST_TYPE).build();
+            pendingRpcRequests.put(((RpcRequest)rpcMessage.getData()).getRequestId(), resultFuture);
             // 发送请求
             channel.writeAndFlush(rpcMessage).addListener(new ChannelFutureListener() {
                 @Override
-                public void operationComplete(ChannelFuture future) throws Exception {
+                public void operationComplete(ChannelFuture future) {
                     if (future.isSuccess()) {
                         log.info("client send message: [{}]", rpcMessage);
                     } else {
@@ -119,11 +97,16 @@ public class NettyClient {
                     }
                 }
             });
-
-        } else {
-            throw new IllegalStateException();
+            // 阻塞等待调用请求的结果，当 Netty Client 收到对应请求的回复时，future.complete（response）,完成相应
+            // TODO 异步调用
+            rpcResponse = resultFuture.get(10, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            log.error("send request error: " + e.getMessage());
+            throw new RpcException("send request error:", e);
+        } finally {
+            channelProvider.remove(remoteaddress);
         }
-        return resultFuture;
+        return rpcResponse;
 
     }
 
@@ -140,7 +123,7 @@ public class NettyClient {
         if (channel == null) {
             // 阻塞等待，获取连接成功的channel
             CompletableFuture<Channel> completableFuture = new CompletableFuture<>();
-            channel = doConnect(completableFuture,inetSocketAddress, MAX_RETRY).get();
+            channel = doConnect(completableFuture, inetSocketAddress, MAX_RETRY).get();
             channelProvider.set(inetSocketAddress, channel);
         }
         return channel;
@@ -151,7 +134,7 @@ public class NettyClient {
      * 与服务端建立连接
      */
     @SneakyThrows
-    public CompletableFuture<Channel> doConnect(CompletableFuture<Channel> completableFuture,InetSocketAddress inetSocketAddress, int retry) {
+    public CompletableFuture<Channel> doConnect(CompletableFuture<Channel> completableFuture, InetSocketAddress inetSocketAddress, int retry) {
         bootstrap.connect(inetSocketAddress).addListener(future -> {
             if (future.isSuccess()) {
                 log.info("The client has connected [{}] successful!", inetSocketAddress.toString());
@@ -165,7 +148,7 @@ public class NettyClient {
                 int delay = 1 << now;
                 log.warn("connect fail, attempt to reconnect. retry:" + now);
                 bootstrap.config().group().schedule(() ->
-                        doConnect(completableFuture,inetSocketAddress, retry - 1), delay, TimeUnit.SECONDS);
+                        doConnect(completableFuture, inetSocketAddress, retry - 1), delay, TimeUnit.SECONDS);
             }
         });
         return completableFuture;

@@ -1,7 +1,7 @@
 package com.dzgu.xrpc.extension;
 
 /**
- * @description:
+ * @description: 持有者。用于单个变量既可以做锁又可以做值
  * @Author： dzgu
  * @Date： 2022/4/22 19:03
  */

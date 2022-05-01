@@ -3,10 +3,11 @@ package com.dzgu.xrpc.client.discover.zk;
 import cn.hutool.core.collection.CollUtil;
 import com.dzgu.xrpc.client.discover.ServiceDiscovery;
 import com.dzgu.xrpc.client.loadbalance.LoadBalance;
-import com.dzgu.xrpc.config.enums.RpcErrorMessageEnum;
+import com.dzgu.xrpc.consts.enums.RpcErrorMessageEnum;
 import com.dzgu.xrpc.dto.RpcRequest;
 import com.dzgu.xrpc.exception.RpcException;
 import com.dzgu.xrpc.extension.ExtensionLoader;
+import com.dzgu.xrpc.properties.RpcConfig;
 import com.dzgu.xrpc.util.ServiceUtil;
 import com.dzgu.xrpc.zookeeper.CuratorClient;
 import com.dzgu.xrpc.zookeeper.CuratorUtils;
@@ -23,31 +24,27 @@ import java.util.List;
  */
 @Slf4j
 public class ZkServiceDiscovery implements ServiceDiscovery {
-    private final LoadBalance loadBalance;
+    private LoadBalance loadBalance;
     private CuratorFramework zkClient;
 
     public ZkServiceDiscovery() {
-        this.loadBalance = ExtensionLoader.getExtensionLoader(LoadBalance.class).getExtension("loadBalance");
-        this.zkClient = CuratorUtils.getZkClient();
     }
 
+
     @Override
-    public InetSocketAddress lookupService(RpcRequest rpcRequest) {
-        String rpcServiceName = rpcRequest.getClassName();
-        String version=rpcRequest.getVersion();
-        String serviceKey = ServiceUtil.makeServiceKey(rpcServiceName, version);
+    public void setRegisterAddress(String registerAddress) {
+        this.zkClient = CuratorUtils.getZkClient(registerAddress);
+    }
+
+
+    @Override
+    public List<String> lookupService(String serviceKey) {
         // 从注册中心 拿到该rpcService下的所有server的Address
         List<String> serviceUrlList = CuratorUtils.getChildrenNodes(zkClient, serviceKey);
         if (CollUtil.isEmpty(serviceUrlList)) {
-            throw new RpcException(RpcErrorMessageEnum.SERVICE_CAN_NOT_BE_FOUND, rpcServiceName);
+            throw new RpcException(RpcErrorMessageEnum.SERVICE_CAN_NOT_BE_FOUND, serviceKey);
         }
-        // 负载均衡
-        String targetServiceUrl = loadBalance.selectServiceAddress(serviceUrlList, rpcRequest);
-        log.info("Successfully found the service address:[{}]", targetServiceUrl);
-        String[] socketAddressArray = targetServiceUrl.split(":");
-        String host = socketAddressArray[0];
-        int port = Integer.parseInt(socketAddressArray[1]);
-        return new InetSocketAddress(host, port);
+        return serviceUrlList;
     }
 
     @Override

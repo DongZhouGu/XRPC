@@ -1,5 +1,5 @@
 package com.dzgu.xrpc.server.core;
-import com.dzgu.xrpc.config.enums.RpcErrorMessageEnum;
+import com.dzgu.xrpc.consts.enums.RpcErrorMessageEnum;
 import com.dzgu.xrpc.exception.RpcException;
 import com.dzgu.xrpc.util.ServiceUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ public class ServiceProvider {
     public void addService(String interfaceName, String version, Object serviceBean) {
         String serviceKey = ServiceUtil.makeServiceKey(interfaceName, version);
         serviceMap.put(serviceKey, serviceBean);
-        log.info("Adding service, interface: {}, version: {}, bean：{}", interfaceName, version, serviceBean);
+        log.info("Adding com.dzgu.xprc.service, interface: {}, version: {}, bean：{}", interfaceName, version, serviceBean);
     }
 
     public Object getService(String rpcServiceName) {

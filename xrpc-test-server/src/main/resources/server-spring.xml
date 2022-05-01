@@ -7,8 +7,8 @@
        http://www.springframework.org/schema/context
        http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <!--scan service package-->
-    <context:component-scan base-package="service"/>
+    <!--scan com.dzgu.xprc.service package-->
+    <context:component-scan base-package="com.dzgu.xprc.service"/>
 
 <!--    <context:property-placeholder location="classpath:xrpc.properties"/>-->
 

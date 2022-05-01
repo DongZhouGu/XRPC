@@ -1,0 +1,2 @@
+fail-fast=com.dzgu.xrpc.client.faultTolerantInvoker.FailFastInvoker
+retry=com.dzgu.xrpc.client.faultTolerantInvoker.RetryInvoker

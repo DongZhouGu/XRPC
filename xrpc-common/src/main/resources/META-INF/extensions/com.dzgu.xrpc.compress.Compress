@@ -1,1 +1,2 @@
 gzip=com.dzgu.xrpc.compress.gzip.GzipCompress
+dummy=com.dzgu.xrpc.compress.dummy.DummyCompress

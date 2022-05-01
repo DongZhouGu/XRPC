@@ -1,7 +1,7 @@
 package com.dzgu.xrpc.compress.gzip;
 
 import com.dzgu.xrpc.compress.Compress;
-import com.dzgu.xrpc.config.enums.CompressTypeEnum;
+import com.dzgu.xrpc.consts.enums.CompressTypeEnum;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import static com.dzgu.xrpc.config.enums.CompressTypeEnum.GZIP;
+import static com.dzgu.xrpc.consts.enums.CompressTypeEnum.GZIP;
 
 /**
  * @description: Gzip压缩算法

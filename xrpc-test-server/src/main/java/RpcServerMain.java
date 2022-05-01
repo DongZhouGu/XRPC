@@ -1,8 +1,5 @@
-import com.dzgu.xrpc.server.RpcServer;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import service.HelloService;
+import com.dzgu.xprc.service.HelloService;
 
 /**
  * @description:

@@ -1,6 +1,6 @@
 package com.dzgu.xrpc.serializer;
 
-import com.dzgu.xrpc.config.enums.SerializerTypeEnum;
+import com.dzgu.xrpc.consts.enums.SerializerTypeEnum;
 import com.dzgu.xrpc.extension.SPI;
 
 /**

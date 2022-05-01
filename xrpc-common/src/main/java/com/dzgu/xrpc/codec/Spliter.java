@@ -1,6 +1,6 @@
 package com.dzgu.xrpc.codec;
 
-import com.dzgu.xrpc.config.RpcConstants;
+import com.dzgu.xrpc.consts.RpcConstants;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 
-import static com.dzgu.xrpc.config.RpcConstants.*;
+import static com.dzgu.xrpc.consts.RpcConstants.*;
 
 /**
  * custom protocol decoder

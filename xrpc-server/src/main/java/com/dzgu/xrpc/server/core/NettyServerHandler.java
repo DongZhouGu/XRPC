@@ -1,7 +1,7 @@
 package com.dzgu.xrpc.server.core;
 
-import com.dzgu.xrpc.config.RpcConstants;
-import com.dzgu.xrpc.config.enums.RpcResponseCodeEnum;
+import com.dzgu.xrpc.consts.RpcConstants;
+import com.dzgu.xrpc.consts.enums.RpcResponseCodeEnum;
 import com.dzgu.xrpc.dto.RpcMessage;
 import com.dzgu.xrpc.dto.RpcRequest;
 import com.dzgu.xrpc.dto.RpcResponse;
@@ -93,7 +93,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<RpcMessage> 
         String serviceKey = ServiceUtil.makeServiceKey(className, version);
         Object serviceBean = serviceProvider.getService(serviceKey);
         if (serviceBean == null) {
-            log.error("Can not find service implement with interface name: {} and version: {}", className, version);
+            log.error("Can not find com.dzgu.xprc.service implement with interface name: {} and version: {}", className, version);
         }
         return invokeCglib(request, serviceBean);
     }
@@ -104,7 +104,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<RpcMessage> 
             Method method = service.getClass().getMethod(rpcRequest.getMethodName(), rpcRequest.getParameterTypes());
             method.setAccessible(true);
             result = method.invoke(service, rpcRequest.getParameters());
-            log.info("service:[{}] successful invoke method:[{}]", rpcRequest.getClassName(), rpcRequest.getMethodName());
+            log.info("com.dzgu.xprc.service:[{}] successful invoke method:[{}]", rpcRequest.getClassName(), rpcRequest.getMethodName());
         } catch (NoSuchMethodException | IllegalArgumentException | InvocationTargetException | IllegalAccessException e) {
             throw new RpcException(e.getMessage(), e);
         }
