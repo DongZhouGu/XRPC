@@ -10,9 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 /**
- * @description:  * Hessian is a dynamically-typed, binary serialization and Web Services protocol designed for object-oriented transmission.
- * @Author： dzgu
- * @Date： 2022/4/22 17:22
+ * @description: Hessian 序列化
  */
 public class HessianSerializer implements Serializer {
     @Override
@@ -27,7 +25,7 @@ public class HessianSerializer implements Serializer {
             hessianOutput.writeObject(object);
             return byteArrayOutputStream.toByteArray();
         } catch (Exception e) {
-            throw new SerializationException("Hessian Serialization failed:",e.getMessage());
+            throw new SerializationException("Hessian Serialization failed:", e.getMessage());
         }
 
     }
@@ -39,7 +37,7 @@ public class HessianSerializer implements Serializer {
             Object o = hessianInput.readObject();
             return clazz.cast(o);
         } catch (Exception e) {
-            throw new SerializationException("Hessian Deserialization failed:",e.getMessage());
+            throw new SerializationException("Hessian Deserialization failed:", e.getMessage());
         }
     }
 }

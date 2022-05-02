@@ -3,10 +3,8 @@ package com.dzgu.xrpc.server.core;
 import com.dzgu.xrpc.codec.RpcDecoder;
 import com.dzgu.xrpc.codec.RpcEncoder;
 import com.dzgu.xrpc.codec.Spliter;
-import com.dzgu.xrpc.consts.enums.RpcConfigEnum;
-import com.dzgu.xrpc.extension.ExtensionLoader;
-import com.dzgu.xrpc.server.registry.ServiceRegistry;
-import com.dzgu.xrpc.util.PropertiesFileUtil;
+import com.dzgu.xrpc.server.invoke.Invoker;
+import com.dzgu.xrpc.server.registry.Registry;
 import com.dzgu.xrpc.util.RuntimeUtil;
 import com.dzgu.xrpc.util.SingletonFactory;
 import com.dzgu.xrpc.util.threadpool.ThreadPoolFactoryUtil;
@@ -21,13 +19,11 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
-import io.protostuff.Rpc;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.net.InetAddress;
+import javax.imageio.spi.ServiceRegistry;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -36,31 +32,15 @@ import java.util.concurrent.TimeUnit;
  * @Date： 2022/4/22 0:06
  */
 @Slf4j
+@Setter
 public class NettyServer {
     private Thread thread;
-    private final ServiceRegistry serviceRegistry;
-    protected final ServiceProvider serviceProvider;
-    private static final int DEFAULT_NETTY_PORT = 18866;
-    private static final String DEFAULT_LOCAL_HOST = "127.0.0.1";
-    private InetSocketAddress serverAddress = getServerAddress();
+    private Registry registry;
+    private Invoker invoker;
+    protected ServiceProvider serviceProvider;
+    private InetSocketAddress serverAddress;
 
     public NettyServer() {
-        this.serviceProvider = SingletonFactory.getInstance(ServiceProvider.class);
-        this.serviceRegistry = ExtensionLoader.getExtensionLoader(ServiceRegistry.class).getExtension("zk");
-        this.serviceRegistry.setRegisterAddress("106.14.145.23:2181");
-    }
-
-    public static InetSocketAddress getServerAddress() {
-        // check if user has set netty port
-        Properties properties = PropertiesFileUtil.readPropertiesFile(RpcConfigEnum.RPC_CONFIG_PATH.getPropertyValue());
-        int nettyPort = properties != null && properties.getProperty(RpcConfigEnum.NETTY_PORT.getPropertyValue()) != null ? Integer.parseInt(properties.getProperty(RpcConfigEnum.NETTY_PORT.getPropertyValue())) : DEFAULT_NETTY_PORT;
-        String host = null;
-        try {
-            host = InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
-            log.error("occur exception when getHostAddress", e);
-        }
-        return new InetSocketAddress(host == null ? DEFAULT_LOCAL_HOST : host, nettyPort);
 
     }
 
@@ -93,19 +73,19 @@ public class NettyServer {
                                 protected void initChannel(NioSocketChannel ch) throws Exception {
                                     // 心跳,空闲检测
                                     ch.pipeline().addLast(new IdleStateHandler(15, 0, 0, TimeUnit.SECONDS));
-                                    // 处理粘包半包
+                                    // 处理粘包包
                                     ch.pipeline().addLast(new Spliter());
                                     ch.pipeline().addLast(new RpcDecoder());
                                     ch.pipeline().addLast(new RpcEncoder());
-                                    ch.pipeline().addLast(serviceHandlerGroup, new NettyServerHandler());
+                                    ch.pipeline().addLast(serviceHandlerGroup, new NettyServerHandler(invoker, serviceProvider));
 
                                 }
                             });
                     // 绑定端口，同步等待绑定成功
                     //bind操作(对应初始化)是异步的，通过sync改为同步等待初始化的完成，否则立即操作对象(未初始完全)可能会报错
-                    ChannelFuture f = bootstrap.bind(serverAddress.getAddress(), serverAddress.getPort()).sync();
-                    if (serviceRegistry != null) {
-                        serviceRegistry.registerServiceMap(serverAddress, serviceProvider.getserviceMap());
+                    ChannelFuture f = bootstrap.bind(serverAddress).sync();
+                    if (registry != null) {
+                        registry.registerServiceMap(serviceProvider.getserviceMap(), serverAddress);
                     } else {
                         log.warn("ServiceRegistry cannot be found and started");
                     }
@@ -120,7 +100,7 @@ public class NettyServer {
                     }
                 } finally {
                     try {
-                        serviceRegistry.unregisterService(serverAddress);
+                        registry.unregisterAllMyService(serverAddress);
                         // 关闭EventLoopGroup
                         // 释放掉所有资源，包括创建的反应器线程
                         workerGroup.shutdownGracefully();

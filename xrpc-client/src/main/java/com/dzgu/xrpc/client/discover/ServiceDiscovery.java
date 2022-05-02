@@ -12,11 +12,7 @@ import java.util.List;
  * @Author： dzgu
  * @Date： 2022/4/25 9:20
  */
-@SPI
 public interface ServiceDiscovery {
-
-    public void setRegisterAddress(String registerAddress);
-
     public List<String> lookupService(String serviceKey);
 
     public void stop();

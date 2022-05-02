@@ -13,9 +13,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 /**
- * @description:
- * @Author： dzgu
- * @Date： 2022/4/22 17:22
+ * @description: Kryo 序列化
  */
 public class KryoSerializer implements Serializer {
     /**

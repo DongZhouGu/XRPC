@@ -24,18 +24,11 @@ import java.util.List;
  */
 @Slf4j
 public class ZkServiceDiscovery implements ServiceDiscovery {
-    private LoadBalance loadBalance;
     private CuratorFramework zkClient;
 
-    public ZkServiceDiscovery() {
+    public ZkServiceDiscovery(String address) {
+        this.zkClient = CuratorUtils.getZkClient(address);
     }
-
-
-    @Override
-    public void setRegisterAddress(String registerAddress) {
-        this.zkClient = CuratorUtils.getZkClient(registerAddress);
-    }
-
 
     @Override
     public List<String> lookupService(String serviceKey) {

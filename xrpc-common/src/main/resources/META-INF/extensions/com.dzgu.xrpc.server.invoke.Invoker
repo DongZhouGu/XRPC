@@ -1,0 +1,2 @@
+jdk=com.dzgu.xrpc.server.invoke.InvokerJDK
+cglib=com.dzgu.xrpc.server.invoke.InvokerCglib

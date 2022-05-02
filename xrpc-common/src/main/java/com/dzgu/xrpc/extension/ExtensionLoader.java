@@ -1,13 +1,10 @@
 package com.dzgu.xrpc.extension;
-
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -138,16 +135,6 @@ public class ExtensionLoader<T> {
         return (T) instance;
     }
 
-    /**
-     * 获取自适应扩展类
-     *
-     * @return 动态代理自适应类
-     */
-    public T getAdaptiveExtension() {
-        InvocationHandler handler = new AdaptiveInvocationHandler<>(type);
-        return (T) Proxy.newProxyInstance(ExtensionLoader.class.getClassLoader(),
-                new Class<?>[]{type}, handler);
-    }
 
     /**
      * 创建对应名字的扩展类实例

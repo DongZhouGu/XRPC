@@ -10,9 +10,7 @@ import io.protostuff.runtime.RuntimeSchema;
 
 
 /**
- * @description:
- * @Author： dzgu
- * @Date： 2022/4/22 17:23
+ * @description: Protostuff序列化
  */
 public class ProtostuffSerializer implements Serializer {
     /**

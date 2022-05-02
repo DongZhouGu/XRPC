@@ -1,5 +1,7 @@
 xrpc:
   enable: true
   serverPort: 18866
+  register: zookeeper
   registerAddress: 106.14.145.23:2181
-
+server:
+  port: 8082

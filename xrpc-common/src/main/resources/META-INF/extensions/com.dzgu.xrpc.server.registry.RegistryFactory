@@ -1,0 +1,1 @@
+zookeeper=com.dzgu.xrpc.server.registry.zk.ZkRegistryFactory

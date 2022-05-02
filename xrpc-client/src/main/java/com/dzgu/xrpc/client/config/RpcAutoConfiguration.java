@@ -1,7 +1,7 @@
 package com.dzgu.xrpc.client.config;
 
-import com.dzgu.xrpc.annotation.RpcAutowired;
 import com.dzgu.xrpc.client.core.NettyClient;
+import com.dzgu.xrpc.client.discover.DiscoveryFactory;
 import com.dzgu.xrpc.client.discover.ServiceDiscovery;
 import com.dzgu.xrpc.client.faultTolerantInvoker.FaultTolerantInvoker;
 import com.dzgu.xrpc.client.loadbalance.LoadBalance;
@@ -10,18 +10,12 @@ import com.dzgu.xrpc.client.proxy.ProxyInjectProcessor;
 import com.dzgu.xrpc.extension.ExtensionLoader;
 import com.dzgu.xrpc.properties.RpcConfig;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.lang.Nullable;
-
-import java.lang.reflect.Field;
 
 
 /**
@@ -42,9 +36,8 @@ public class RpcAutoConfiguration implements DisposableBean {
 
     @Bean
     public ServiceDiscovery serviceDiscovery(@Autowired RpcConfig rpcConfig) {
-        //serviceDiscovery = ExtensionLoader.getExtensionLoader(ServiceDiscovery.class).getAdaptiveExtension();
-        serviceDiscovery = ExtensionLoader.getExtensionLoader(ServiceDiscovery.class).getExtension("zk");
-        serviceDiscovery.setRegisterAddress(rpcConfig.getRegisterAddress());
+        DiscoveryFactory discoveryFactory = ExtensionLoader.getExtensionLoader(DiscoveryFactory.class).getExtension(rpcConfig.getRegister());
+        serviceDiscovery = discoveryFactory.getDiscovery(rpcConfig.getRegisterAddress());
         return serviceDiscovery;
     }
 
@@ -71,7 +64,7 @@ public class RpcAutoConfiguration implements DisposableBean {
     }
 
     @Bean
-    public ProxyInjectProcessor injectProcessor(@Autowired RpcConfig rpcConfig) {
+    public ProxyInjectProcessor injectProcessor() {
         ProxyInjectProcessor proxyInjectProcessor = new ProxyInjectProcessor();
         proxyInjectProcessor.setProxyFactory(proxyFactory);
         return proxyInjectProcessor;

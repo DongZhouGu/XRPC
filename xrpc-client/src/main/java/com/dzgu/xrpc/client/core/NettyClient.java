@@ -140,7 +140,7 @@ public class NettyClient {
                 log.info("The client has connected [{}] successful!", inetSocketAddress.toString());
                 completableFuture.complete(((ChannelFuture) future).channel());
             } else if (retry == 0) {
-                log.error("the number of retries expired, connect fail. address:", inetSocketAddress);
+                log.error("the number of retries expired, connect fail. address:", inetSocketAddress.toString());
             } else {
                 // 当前是第几次重连
                 int now = MAX_RETRY - retry + 1;

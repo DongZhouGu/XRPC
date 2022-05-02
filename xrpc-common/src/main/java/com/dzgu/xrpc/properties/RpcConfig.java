@@ -4,7 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * @description: Rpc配置
+ * @description: Rpc配置类
  * @Author： dzgu
  * @Date： 2022/5/1 12:03
  */
@@ -19,7 +19,13 @@ public class RpcConfig {
     /**
      * 注册中心地址
      */
-    private String registerAddress = "zk://10.20.153.10:6379?backup=10.20.153.11:6379,10.20.153.12:6379";
+    private String registerAddress = "127.0.0.1:2181";
+
+    /**
+     * 注册中心
+     */
+    private String register = "zookeeper";
+
 
     /**
      * 服务暴露端口
@@ -53,7 +59,7 @@ public class RpcConfig {
 
 
     /**
-     * 服务代理类型 reflect： 反射调用 javassist： 字节码生成代理类调用
+     * 服务代理类型 reflect：
      */
-    private String proxyType = "javassist";
+    private String proxyType = "cglib";
 }
