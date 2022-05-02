@@ -1,16 +1,13 @@
 package com.dzgu.xrpc.server;
 
-import com.dzgu.xrpc.annotation.RpcAutowired;
 import com.dzgu.xrpc.annotation.RpcService;
 import com.dzgu.xrpc.server.core.NettyServer;
-import com.dzgu.xrpc.server.core.ServiceProvider;
+import com.dzgu.xrpc.server.core.ServiceRegisterCache;
 import lombok.Setter;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
-import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Objects;
 
@@ -22,7 +19,7 @@ import java.util.Objects;
 @Setter
 public class ServiceInjectProcessor implements ApplicationListener<ContextRefreshedEvent> {
     private NettyServer nettyServer;
-    private ServiceProvider serviceProvider;
+    private ServiceRegisterCache serviceRegisterCache;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
@@ -35,11 +32,11 @@ public class ServiceInjectProcessor implements ApplicationListener<ContextRefres
                     RpcService rpcService = serviceBean.getClass().getAnnotation(RpcService.class);
                     String interfaceName = rpcService.value().getName();
                     String version = rpcService.version();
-                    serviceProvider.addService(interfaceName, version, serviceBean);
+                    serviceRegisterCache.addService(interfaceName, version, serviceBean);
 
                 }
             }
-            nettyServer.setServiceProvider(serviceProvider);
+            nettyServer.setServiceRegisterCache(serviceRegisterCache);
             nettyServer.start();
         }
     }

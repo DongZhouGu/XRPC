@@ -1,17 +1,12 @@
 package com.dzgu.xrpc.client.core;
 
-import com.dzgu.xrpc.client.discover.ServiceDiscovery;
 import com.dzgu.xrpc.codec.RpcDecoder;
 import com.dzgu.xrpc.codec.RpcEncoder;
 import com.dzgu.xrpc.codec.Spliter;
-import com.dzgu.xrpc.consts.RpcConstants;
-import com.dzgu.xrpc.consts.enums.CompressTypeEnum;
-import com.dzgu.xrpc.consts.enums.SerializerTypeEnum;
 import com.dzgu.xrpc.dto.RpcMessage;
 import com.dzgu.xrpc.dto.RpcRequest;
 import com.dzgu.xrpc.dto.RpcResponse;
 import com.dzgu.xrpc.exception.RpcException;
-import com.dzgu.xrpc.extension.ExtensionLoader;
 import com.dzgu.xrpc.util.SingletonFactory;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -29,8 +24,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import static com.dzgu.xrpc.consts.RpcConstants.MAX_RETRY;
-import static com.dzgu.xrpc.consts.RpcConstants.REQUEST_ID;
-import static com.dzgu.xrpc.consts.enums.RpcErrorMessageEnum.SERVICE_INVOCATION_FAILURE;
 
 /**
  * @description: Netty 客户端

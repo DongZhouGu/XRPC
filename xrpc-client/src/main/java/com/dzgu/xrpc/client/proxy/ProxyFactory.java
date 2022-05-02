@@ -1,9 +1,7 @@
 package com.dzgu.xrpc.client.proxy;
 
-import cn.hutool.core.collection.CollUtil;
 import com.dzgu.xrpc.client.core.NettyClient;
-import com.dzgu.xrpc.client.discover.ServerDiscoveryCache;
-import com.dzgu.xrpc.client.discover.ServiceDiscovery;
+import com.dzgu.xrpc.client.core.ServerDiscoveryCache;
 import com.dzgu.xrpc.client.faultTolerantInvoker.FaultTolerantInvoker;
 import com.dzgu.xrpc.client.faultTolerantInvoker.RetryInvoker;
 import com.dzgu.xrpc.client.loadbalance.LoadBalance;
@@ -16,6 +14,7 @@ import com.dzgu.xrpc.dto.RpcMessage;
 import com.dzgu.xrpc.dto.RpcRequest;
 import com.dzgu.xrpc.dto.RpcResponse;
 import com.dzgu.xrpc.exception.RpcException;
+import com.dzgu.xrpc.register.Register;
 import com.dzgu.xrpc.util.ServiceUtil;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -25,13 +24,10 @@ import lombok.extern.slf4j.Slf4j;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 import static com.dzgu.xrpc.consts.RpcConstants.REQUEST_ID;
 
@@ -44,7 +40,7 @@ import static com.dzgu.xrpc.consts.RpcConstants.REQUEST_ID;
 @Accessors(chain = true)
 @Slf4j
 public class ProxyFactory {
-    private ServiceDiscovery serviceDiscovery;
+    private Register register;
 
     private NettyClient nettyClient;
 
@@ -140,7 +136,7 @@ public class ProxyFactory {
         List<String> serviceUrlList;
         synchronized (serviceName) {
             if (ServerDiscoveryCache.isEmpty(serviceName)) {
-                serviceUrlList = serviceDiscovery.lookupService(serviceName);
+                serviceUrlList = register.lookupService(serviceName);
                 ServerDiscoveryCache.put(serviceName, serviceUrlList);
             } else {
                 serviceUrlList = ServerDiscoveryCache.get(serviceName);

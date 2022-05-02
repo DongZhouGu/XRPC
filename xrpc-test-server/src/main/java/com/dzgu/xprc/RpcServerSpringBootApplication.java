@@ -1,10 +1,7 @@
 package com.dzgu.xprc;
 
-import com.dzgu.xrpc.server.RpcServer;
-import com.dzgu.xrpc.server.core.NettyServer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
  * @description:

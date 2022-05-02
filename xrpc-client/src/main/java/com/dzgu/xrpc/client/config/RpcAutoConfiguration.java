@@ -1,14 +1,14 @@
 package com.dzgu.xrpc.client.config;
 
 import com.dzgu.xrpc.client.core.NettyClient;
-import com.dzgu.xrpc.client.discover.DiscoveryFactory;
-import com.dzgu.xrpc.client.discover.ServiceDiscovery;
 import com.dzgu.xrpc.client.faultTolerantInvoker.FaultTolerantInvoker;
 import com.dzgu.xrpc.client.loadbalance.LoadBalance;
 import com.dzgu.xrpc.client.proxy.ProxyFactory;
 import com.dzgu.xrpc.client.proxy.ProxyInjectProcessor;
 import com.dzgu.xrpc.extension.ExtensionLoader;
 import com.dzgu.xrpc.properties.RpcConfig;
+import com.dzgu.xrpc.register.Register;
+import com.dzgu.xrpc.register.RegisterFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,16 +29,16 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnProperty(prefix = "xrpc", name = "enable", havingValue = "true", matchIfMissing = true)
 public class RpcAutoConfiguration implements DisposableBean {
 
-    private ServiceDiscovery serviceDiscovery;
+    private Register register;
     private NettyClient nettyClient;
     private ProxyFactory proxyFactory;
 
 
     @Bean
-    public ServiceDiscovery serviceDiscovery(@Autowired RpcConfig rpcConfig) {
-        DiscoveryFactory discoveryFactory = ExtensionLoader.getExtensionLoader(DiscoveryFactory.class).getExtension(rpcConfig.getRegister());
-        serviceDiscovery = discoveryFactory.getDiscovery(rpcConfig.getRegisterAddress());
-        return serviceDiscovery;
+    public Register serviceDiscovery(@Autowired RpcConfig rpcConfig) {
+        RegisterFactory registerFactory = ExtensionLoader.getExtensionLoader(RegisterFactory.class).getExtension(rpcConfig.getRegister());
+        register = registerFactory.getRegister(rpcConfig.getRegisterAddress());
+        return register;
     }
 
     @Bean
@@ -55,7 +55,7 @@ public class RpcAutoConfiguration implements DisposableBean {
         proxyFactory = new ProxyFactory();
         proxyFactory.setNettyClient(nettyClient)
                 .setLoadBalance(loadBalance)
-                .setServiceDiscovery(serviceDiscovery)
+                .setRegister(register)
                 .setFaultTolerantInvoker(tolerantInvoker)
                 .setRetryTime(rpcConfig.getRetryTimes())
                 .setCompress(rpcConfig.getCompress())
@@ -73,7 +73,7 @@ public class RpcAutoConfiguration implements DisposableBean {
 
     @Override
     public void destroy() {
-        serviceDiscovery.stop();
+        register.stop();
         nettyClient.stop();
     }
 

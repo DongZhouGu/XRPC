@@ -9,17 +9,17 @@ import java.util.Map;
  * @Author： dzgu
  * @Date： 2022/5/2 15:00
  */
-public interface Registry {
+public interface Register {
     default void registerServiceMap(Map<String, Object> serviceMap, InetSocketAddress serverAddress) {
         for (String rpcServiceName : serviceMap.keySet()) {
-            register(rpcServiceName, serverAddress);
+            registerService(rpcServiceName, serverAddress);
         }
     }
 
     /**
      * 向注册中心注册服务
      */
-    void register(String rpcServiceName, InetSocketAddress inetSocketAddress);
+    void registerService(String rpcServiceName, InetSocketAddress inetSocketAddress);
 
     /**
      * 取消所有本机的服务，用于关机的时候

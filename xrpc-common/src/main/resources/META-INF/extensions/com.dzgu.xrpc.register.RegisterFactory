@@ -1,1 +1,1 @@
-zookeeper=
+zookeeper=com.dzgu.xrpc.register.zk.ZkRegistryFactory

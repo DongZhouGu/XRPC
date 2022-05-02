@@ -6,3 +6,4 @@
 /logs/
 /.idea/
 /xrpc-server/target/
+/xrpc-test-client/logs/

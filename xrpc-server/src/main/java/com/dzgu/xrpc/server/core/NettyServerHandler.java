@@ -5,19 +5,15 @@ import com.dzgu.xrpc.consts.enums.RpcResponseCodeEnum;
 import com.dzgu.xrpc.dto.RpcMessage;
 import com.dzgu.xrpc.dto.RpcRequest;
 import com.dzgu.xrpc.dto.RpcResponse;
-import com.dzgu.xrpc.exception.RpcException;
 import com.dzgu.xrpc.server.invoke.Invoker;
 import com.dzgu.xrpc.util.ServiceUtil;
-import com.dzgu.xrpc.util.SingletonFactory;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.cglib.reflect.FastClass;
-import org.checkerframework.common.reflection.qual.Invoke;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 /**
  * @description: Netty 服务端业务逻辑
@@ -27,10 +23,10 @@ import java.lang.reflect.Method;
 @Slf4j
 public class NettyServerHandler extends SimpleChannelInboundHandler<RpcMessage> {
     private Invoker invoker;
-    private ServiceProvider serviceProvider;
-    public NettyServerHandler(Invoker invoker,ServiceProvider serviceProvider) {
+    private ServiceRegisterCache serviceRegisterCache;
+    public NettyServerHandler(Invoker invoker,ServiceRegisterCache serviceRegisterCache) {
         this.invoker=invoker;
-        this.serviceProvider=serviceProvider;
+        this.serviceRegisterCache=serviceRegisterCache;
     }
 
     @Override
@@ -94,7 +90,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<RpcMessage> 
         String className = request.getClassName();
         String version = request.getVersion();
         String serviceKey = ServiceUtil.makeServiceKey(className, version);
-        Object serviceBean = serviceProvider.getService(serviceKey);
+        Object serviceBean = serviceRegisterCache.getService(serviceKey);
         if (serviceBean == null) {
             log.error("Can not find com.dzgu.xprc.service implement with interface name: {} and version: {}", className, version);
         }

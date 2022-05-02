@@ -3,10 +3,9 @@ package com.dzgu.xrpc.server.core;
 import com.dzgu.xrpc.codec.RpcDecoder;
 import com.dzgu.xrpc.codec.RpcEncoder;
 import com.dzgu.xrpc.codec.Spliter;
+import com.dzgu.xrpc.register.Register;
 import com.dzgu.xrpc.server.invoke.Invoker;
-import com.dzgu.xrpc.server.registry.Registry;
 import com.dzgu.xrpc.util.RuntimeUtil;
-import com.dzgu.xrpc.util.SingletonFactory;
 import com.dzgu.xrpc.util.threadpool.ThreadPoolFactoryUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -22,7 +21,6 @@ import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.imageio.spi.ServiceRegistry;
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
@@ -35,9 +33,9 @@ import java.util.concurrent.TimeUnit;
 @Setter
 public class NettyServer {
     private Thread thread;
-    private Registry registry;
+    private Register register;
     private Invoker invoker;
-    protected ServiceProvider serviceProvider;
+    protected ServiceRegisterCache serviceRegisterCache;
     private InetSocketAddress serverAddress;
 
     public NettyServer() {
@@ -77,15 +75,15 @@ public class NettyServer {
                                     ch.pipeline().addLast(new Spliter());
                                     ch.pipeline().addLast(new RpcDecoder());
                                     ch.pipeline().addLast(new RpcEncoder());
-                                    ch.pipeline().addLast(serviceHandlerGroup, new NettyServerHandler(invoker, serviceProvider));
+                                    ch.pipeline().addLast(serviceHandlerGroup, new NettyServerHandler(invoker, serviceRegisterCache));
 
                                 }
                             });
                     // 绑定端口，同步等待绑定成功
                     //bind操作(对应初始化)是异步的，通过sync改为同步等待初始化的完成，否则立即操作对象(未初始完全)可能会报错
                     ChannelFuture f = bootstrap.bind(serverAddress).sync();
-                    if (registry != null) {
-                        registry.registerServiceMap(serviceProvider.getserviceMap(), serverAddress);
+                    if (register != null) {
+                        register.registerServiceMap(serviceRegisterCache.getserviceMap(), serverAddress);
                     } else {
                         log.warn("ServiceRegistry cannot be found and started");
                     }
@@ -100,7 +98,7 @@ public class NettyServer {
                     }
                 } finally {
                     try {
-                        registry.unregisterAllMyService(serverAddress);
+                        register.unregisterAllMyService(serverAddress);
                         // 关闭EventLoopGroup
                         // 释放掉所有资源，包括创建的反应器线程
                         workerGroup.shutdownGracefully();
