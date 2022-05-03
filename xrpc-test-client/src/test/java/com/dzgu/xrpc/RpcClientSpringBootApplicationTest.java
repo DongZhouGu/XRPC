@@ -1,12 +1,10 @@
 package com.dzgu.xrpc;
 
 import com.dzgu.xprc.RpcClientSpringBootApplication;
-
 import com.dzgu.xprc.controller.HelloController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * @description:

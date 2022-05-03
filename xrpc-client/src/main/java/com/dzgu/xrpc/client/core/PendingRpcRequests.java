@@ -18,6 +18,10 @@ public class PendingRpcRequests {
         PENDING_RESPONSE_FUTURES.put(requestId, future);
     }
 
+    public void remove(String requestId) {
+        PENDING_RESPONSE_FUTURES.remove(requestId);
+    }
+
     /**
      * 将请求与调用结果响应绑定
      *

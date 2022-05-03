@@ -1,7 +1,7 @@
 xrpc:
   enable: true
   serverPort: 18866
-  register: zookeeper
-  registerAddress: 106.14.145.23:2181
+  register: nacos
+  registerAddress: 106.14.145.23:8848
 server:
   port: 8082

@@ -76,7 +76,7 @@ public class NettyClient {
         RpcResponse<Object> rpcResponse = null;
         try {
             // 将请求放入未完成请求的Map缓存中,key为请求的唯一ID, value存放异步回调Future
-            pendingRpcRequests.put(((RpcRequest)rpcMessage.getData()).getRequestId(), resultFuture);
+            pendingRpcRequests.put(((RpcRequest) rpcMessage.getData()).getRequestId(), resultFuture);
             // 发送请求
             channel.writeAndFlush(rpcMessage).addListener(new ChannelFutureListener() {
                 @Override
@@ -97,7 +97,7 @@ public class NettyClient {
             log.error("send request error: " + e.getMessage());
             throw new RpcException("send request error:", e);
         } finally {
-            channelProvider.remove(remoteaddress);
+            pendingRpcRequests.remove(((RpcRequest) rpcMessage.getData()).getRequestId());
         }
         return rpcResponse;
 
