@@ -1,7 +1,6 @@
 package com.dzgu.xrpc.client.proxy;
 
 import com.dzgu.xrpc.client.core.NettyClient;
-import com.dzgu.xrpc.client.core.ServerDiscoveryCache;
 import com.dzgu.xrpc.client.faultTolerantInvoker.FaultTolerantInvoker;
 import com.dzgu.xrpc.client.faultTolerantInvoker.RetryInvoker;
 import com.dzgu.xrpc.client.loadbalance.LoadBalance;
@@ -96,7 +95,7 @@ public class ProxyFactory {
             String version = rpcRequest.getVersion();
             String serviceKey = ServiceUtil.makeServiceKey(rpcServiceName, version);
             // 从注册中心 拿到该rpcService下的所有server的Address
-            List<String> serviceUrlList = getServiceList(serviceKey);
+            List<String> serviceUrlList = register.lookupService(serviceKey);;
             // 负载均衡
             String targetServiceUrl = loadBalance.selectServiceAddress(serviceUrlList, rpcRequest);
             log.info("Successfully found the com.dzgu.xprc.service address:[{}]", targetServiceUrl);
@@ -130,18 +129,5 @@ public class ProxyFactory {
                 throw new RpcException(RpcErrorMessageEnum.SERVICE_INVOCATION_FAILURE, "interfaceName" + ":" + rpcRequest.getMethodName());
             }
         }
-    }
-
-    public List<String> getServiceList(String serviceName) {
-        List<String> serviceUrlList;
-        synchronized (serviceName) {
-            if (ServerDiscoveryCache.isEmpty(serviceName)) {
-                serviceUrlList = register.lookupService(serviceName);
-                ServerDiscoveryCache.put(serviceName, serviceUrlList);
-            } else {
-                serviceUrlList = ServerDiscoveryCache.get(serviceName);
-            }
-        }
-        return serviceUrlList;
     }
 }

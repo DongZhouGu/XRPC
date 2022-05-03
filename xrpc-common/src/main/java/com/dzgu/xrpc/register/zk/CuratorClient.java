@@ -1,4 +1,4 @@
-package com.dzgu.xrpc.zookeeper;
+package com.dzgu.xrpc.register.zk;
 
 import com.dzgu.xrpc.consts.ZkConstants;
 import org.apache.curator.framework.CuratorFramework;

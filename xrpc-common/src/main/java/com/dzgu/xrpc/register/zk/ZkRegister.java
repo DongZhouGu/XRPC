@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import com.dzgu.xrpc.consts.enums.RpcErrorMessageEnum;
 import com.dzgu.xrpc.exception.RpcException;
 import com.dzgu.xrpc.register.Register;
-import com.dzgu.xrpc.zookeeper.CuratorUtils;
 import org.apache.curator.framework.CuratorFramework;
 
 import java.net.InetSocketAddress;

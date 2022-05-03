@@ -1,1 +1,2 @@
 zookeeper=com.dzgu.xrpc.register.zk.ZkRegistryFactory
+nacos=com.dzgu.xrpc.register.nacos.NacosRegisterfactory

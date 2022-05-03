@@ -1,4 +1,4 @@
-package com.dzgu.xrpc.zookeeper;
+package com.dzgu.xrpc.register.zk;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
@@ -50,7 +50,6 @@ public class CuratorUtils {
     /**
      * Gets the children under a node
      *
-     * @param rpcServiceName rpc com.dzgu.xprc.service name eg:github.javaguide.HelloServicetest2version1
      * @return All child nodes under the specified node
      */
     public static List<String> getChildrenNodes(CuratorFramework zkClient, String rpcServiceName) {
@@ -118,7 +117,6 @@ public class CuratorUtils {
     /**
      * Registers to listen for changes to the specified node
      *
-     * @param rpcServiceName rpc com.dzgu.xprc.service name eg:github.javaguide.HelloServicetest2version
      */
     private static void registerWatcher(String rpcServiceName, CuratorFramework zkClient) throws Exception {
         String servicePath = ZK_REGISTER_ROOT_PATH + "/" + rpcServiceName;

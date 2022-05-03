@@ -17,8 +17,6 @@
         <module>xrpc-server</module>
         <module>xrpc-common</module>
         <module>xrpc-client</module>
-        <module>xrpc-test-server</module>
-        <module>xrpc-test-client</module>
     </modules>
 
     <properties>
@@ -114,6 +112,12 @@
             <version>${curator.version}</version>
         </dependency>
 
+        <!-- nacos    -->
+        <dependency>
+            <groupId>com.alibaba.nacos</groupId>
+            <artifactId>nacos-client</artifactId>
+            <version>1.1.1</version>
+        </dependency>
         <!-- Apache Commons Collections -->
         <dependency>
             <groupId>org.apache.commons</groupId>
