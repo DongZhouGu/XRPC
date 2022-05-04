@@ -8,7 +8,7 @@ import com.dzgu.xrpc.extension.SPI;
  * @Author： dzgu
  * @Date： 2022/4/22 17:01
  */
-@SPI
+@SPI(value="kryo")
 public interface Serializer {
 
     SerializerTypeEnum getSerializerAlgorithm();
