@@ -7,4 +7,4 @@
 > **XRPC-实现轻量级RPC框架！**
 
 [Github](https://github.com/DongZhouGu/XRPC)
-[开始阅读](#XRPC)
+[开始阅读](../README.md)
