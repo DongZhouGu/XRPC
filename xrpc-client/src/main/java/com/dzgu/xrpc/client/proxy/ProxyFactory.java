@@ -52,27 +52,41 @@ public class ProxyFactory {
 
     private Map<String, Object> objectCache = new HashMap<>();
 
+    private Map<String, Object> asyncObjectCache = new HashMap<>();
+
 
     /**
      * 获取被调用服务的动态代理类
      */
-    public <T> T getProxy(Class<T> interfaceClass, String version) {
-        return (T) objectCache.computeIfAbsent(interfaceClass.getName() + version, clz ->
-                Proxy.newProxyInstance(
-                        interfaceClass.getClassLoader(),
-                        new Class<?>[]{interfaceClass},
-                        new ObjectProxy<T>(interfaceClass, version)
-                )
-        );
+    public <T> T getProxy(Class<T> interfaceClass, String version, boolean isAsync) {
+        if (isAsync) {
+            return (T) asyncObjectCache.computeIfAbsent(interfaceClass.getName() + version, clz ->
+                    Proxy.newProxyInstance(
+                            interfaceClass.getClassLoader(),
+                            new Class<?>[]{interfaceClass},
+                            new ObjectProxy<T>(interfaceClass, version, isAsync)
+                    )
+            );
+        } else {
+            return (T) objectCache.computeIfAbsent(interfaceClass.getName() + version, clz ->
+                    Proxy.newProxyInstance(
+                            interfaceClass.getClassLoader(),
+                            new Class<?>[]{interfaceClass},
+                            new ObjectProxy<T>(interfaceClass, version, isAsync)
+                    )
+            );
+        }
     }
 
     private class ObjectProxy<T> implements InvocationHandler {
         private Class<T> clazz;
         private String version;
+        private boolean isAsync;
 
-        public ObjectProxy(Class<T> clazz, String version) {
+        public ObjectProxy(Class<T> clazz, String version, boolean isAsync) {
             this.clazz = clazz;
             this.version = version;
+            this.isAsync = isAsync;
         }
 
         /**
@@ -95,12 +109,14 @@ public class ProxyFactory {
             String version = rpcRequest.getVersion();
             String serviceKey = ServiceUtil.makeServiceKey(rpcServiceName, version);
             // 从注册中心 拿到该rpcService下的所有server的Address
-            List<String> serviceUrlList = register.lookupService(serviceKey);;
+            List<String> serviceUrlList = register.lookupService(serviceKey);
+            ;
             // 负载均衡
             String targetServiceUrl = loadBalance.selectServiceAddress(serviceUrlList, rpcRequest);
             log.info("Successfully found the com.dzgu.xprc.service address:[{}]", targetServiceUrl);
             //封装Message
-            RpcMessage rpcMessage = RpcMessage.builder().data(rpcRequest)
+            RpcMessage rpcMessage = RpcMessage.builder()
+                    .data(rpcRequest)
                     .codec(SerializerTypeEnum.getCode(serializer))
                     .compress(CompressTypeEnum.getCode(compress))
                     .requestId(REQUEST_ID.getAndIncrement())
@@ -110,7 +126,7 @@ public class ProxyFactory {
             if (faultTolerantInvoker instanceof RetryInvoker) {
                 RetryInvoker.DEFAULT_RETRY_TIMES = retryTime;
             }
-            rpcResponse = faultTolerantInvoker.doinvoke(nettyClient, rpcMessage, targetServiceUrl);
+            rpcResponse = faultTolerantInvoker.doinvoke(nettyClient, rpcMessage, targetServiceUrl, isAsync);
             this.check(rpcResponse, rpcRequest);
             return rpcResponse.getData();
 

@@ -1,5 +1,8 @@
 package com.dzgu.xrpc.client.core;
 
+import com.dzgu.xrpc.client.async.ResponseCallback;
+import com.dzgu.xrpc.client.async.RpcContext;
+import com.dzgu.xrpc.client.async.RpcFuture;
 import com.dzgu.xrpc.codec.RpcDecoder;
 import com.dzgu.xrpc.codec.RpcEncoder;
 import com.dzgu.xrpc.codec.Spliter;
@@ -64,19 +67,31 @@ public class NettyClient {
     }
 
 
-    public RpcResponse<Object> sendRequest(RpcMessage rpcMessage, String targetServiceUrl) {
+    public RpcResponse<Object> sendRequest(RpcMessage rpcMessage, String targetServiceUrl, boolean isAsync) {
         String[] socketAddressArray = targetServiceUrl.split(":");
         String host = socketAddressArray[0];
         int port = Integer.parseInt(socketAddressArray[1]);
         InetSocketAddress remoteaddress = new InetSocketAddress(host, port);
         // 构造返回Future
-        CompletableFuture<RpcResponse<Object>> resultFuture = new CompletableFuture<>();
+        RpcFuture resultFuture = new RpcFuture();
         // Channel复用，获取之前连接过的或者断线重连得Netty Channel
         Channel channel = getChannel(remoteaddress);
+        if (isAsync) {
+            return sendAsyncRequest(channel, resultFuture, rpcMessage);
+        } else {
+            return sendSyncRequest(channel, resultFuture, rpcMessage);
+        }
+
+
+    }
+
+    private RpcResponse<Object> sendAsyncRequest(Channel channel, RpcFuture resultFuture, RpcMessage rpcMessage) {
         RpcResponse<Object> rpcResponse = null;
+        String requestId = ((RpcRequest) rpcMessage.getData()).getRequestId();
+        ResponseCallback callback = RpcContext.getCallback();
+        resultFuture.setResponseCallback(callback);
         try {
-            // 将请求放入未完成请求的Map缓存中,key为请求的唯一ID, value存放异步回调Future
-            pendingRpcRequests.put(((RpcRequest) rpcMessage.getData()).getRequestId(), resultFuture);
+            pendingRpcRequests.put(requestId, resultFuture);
             // 发送请求
             channel.writeAndFlush(rpcMessage).addListener(new ChannelFutureListener() {
                 @Override
@@ -85,22 +100,46 @@ public class NettyClient {
                         log.info("client send message: [{}]", rpcMessage);
                     } else {
                         future.channel().close();
-                        resultFuture.completeExceptionally(future.cause());
+                        log.error("Send failed:", future.cause());
+                    }
+                }
+            });
+            // 直接返回空的数据体
+            rpcResponse = RpcResponse.success(null, requestId);
+        } catch (Exception e) {
+            pendingRpcRequests.remove(requestId);
+            log.error("send request error: " + e.getMessage());
+            throw new RpcException("send request error:", e);
+        }
+        return rpcResponse;
+    }
+
+    private RpcResponse<Object> sendSyncRequest(Channel channel, RpcFuture resultFuture, RpcMessage rpcMessage) {
+        RpcResponse<Object> rpcResponse = null;
+        String requestId = ((RpcRequest) rpcMessage.getData()).getRequestId();
+        try {
+            // 将请求放入未完成请求的Map缓存中,key为请求的唯一ID, value存放异步回调Future
+            pendingRpcRequests.put(requestId, resultFuture);
+            // 发送请求
+            channel.writeAndFlush(rpcMessage).addListener(new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture future) {
+                    if (future.isSuccess()) {
+                        log.info("client send message: [{}]", rpcMessage);
+                    } else {
+                        future.channel().close();
                         log.error("Send failed:", future.cause());
                     }
                 }
             });
             // 阻塞等待调用请求的结果，当 Netty Client 收到对应请求的回复时，future.complete（response）,完成相应
-            // TODO 异步调用
-            rpcResponse = resultFuture.get(10, TimeUnit.SECONDS);
+            rpcResponse = resultFuture.get(5, TimeUnit.SECONDS);
         } catch (Exception e) {
+            pendingRpcRequests.remove(requestId);
             log.error("send request error: " + e.getMessage());
             throw new RpcException("send request error:", e);
-        } finally {
-            pendingRpcRequests.remove(((RpcRequest) rpcMessage.getData()).getRequestId());
         }
         return rpcResponse;
-
     }
 
     /**

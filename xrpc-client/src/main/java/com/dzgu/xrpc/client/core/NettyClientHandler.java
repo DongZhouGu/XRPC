@@ -14,9 +14,6 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
 
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-
 /**
  * @description: Netty客户端业务逻辑
  * @Author： dzgu
@@ -48,7 +45,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<RpcMessage> 
             log.info("heart receive[{}]", rpcMessage.getData());
         } else if (messageType == RpcConstants.RESPONSE_TYPE) {
             RpcResponse<Object> rpcResponse = (RpcResponse<Object>) rpcMessage.getData();
-            // 调用结果相应 绑定到对应的请求
+            // 调用结果响应 绑定到对应的请求
             pendingRpcRequests.complete(rpcResponse);
         }
     }

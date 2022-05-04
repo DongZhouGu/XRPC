@@ -1,9 +1,11 @@
 package com.dzgu.xprc.controller;
 
-import com.dzgu.xrpc.annotation.RpcAutowired;
 import com.dzgu.xprc.entity.Hello;
-import org.springframework.stereotype.Component;
 import com.dzgu.xprc.service.HelloService;
+import com.dzgu.xrpc.annotation.RpcAutowired;
+import com.dzgu.xrpc.client.async.ResponseCallback;
+import com.dzgu.xrpc.client.async.RpcContext;
+import com.dzgu.xrpc.dto.RpcResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,6 +19,9 @@ public class HelloController {
     @RpcAutowired(version = "1.0")
     private HelloService helloService;
 
+    @RpcAutowired(version = "1.0",isAsync = true)
+    private HelloService helloServiceAsync;
+
     @GetMapping("/hello")
     public String sayHello() {
         String res = helloService.hello(new Hello("111", "222"));
@@ -24,12 +29,30 @@ public class HelloController {
     }
 
     public void test() throws InterruptedException {
-        String hello = helloService.hello(new Hello("111", "222"));
-        //如需使用 assert 断言，需要在 VM options 添加参数：-ea
         for (int i = 0; i < 1000; i++) {
-            System.out.println(helloService.hello(new Hello("111", "222")));
+            System.out.println(i+"----sync:"+helloService.hello(new Hello("hello", "hello sync")));
             Thread.sleep(1000);
         }
     }
+
+    public void testAsync() throws InterruptedException {
+        //如需使用 assert 断言，需要在 VM options 添加参数：-ea
+        for (int i = 0; i < 1000; i++) {
+            helloServiceAsync.hello(new Hello("hello", "hello async"));
+            RpcContext.setCallback(new ResponseCallback() {
+                @Override
+                public void callBack(RpcResponse<Object> result) {
+                    System.out.println("----Async--requetId:"+ result.getRequestId()+"--data:"+result.getData());
+                }
+                @Override
+                public void onException(RpcResponse<Object> result, Exception e) {
+
+                }
+            });
+            Thread.sleep(1000);
+        }
+    }
+
+
 
 }

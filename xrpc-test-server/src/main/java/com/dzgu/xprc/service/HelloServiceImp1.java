@@ -21,6 +21,12 @@ public class HelloServiceImp1 implements HelloService{
         log.info("HelloServiceImpl收到: {}.", hello.getMessage());
         String result = "Hello description is " + hello.getDescription();
         log.info("HelloServiceImpl返回: {}.", result);
+        // 模拟耗时操作
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return result;
     }
 }

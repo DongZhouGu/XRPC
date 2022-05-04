@@ -3,7 +3,6 @@ package com.dzgu.xrpc.client.proxy;
 import com.dzgu.xrpc.annotation.RpcAutowired;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.aop.support.AopUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -34,9 +33,10 @@ public class ProxyInjectProcessor implements ApplicationListener<ContextRefreshe
                     RpcAutowired rpcAutowired = field.getAnnotation(RpcAutowired.class);
                     if (rpcAutowired != null) {
                         String version = rpcAutowired.version();
+                        boolean isAsync = rpcAutowired.isAsync();
                         field.setAccessible(true);
                         try {
-                            field.set(bean, proxyFactory.getProxy(field.getType(), version));
+                            field.set(bean, proxyFactory.getProxy(field.getType(), version,isAsync));
                         } catch (IllegalAccessException e) {
                             log.error("field.set error. bean={}, field={}", bean.getClass(), field.getName(), e);
                         }

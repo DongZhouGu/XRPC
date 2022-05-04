@@ -17,4 +17,5 @@ import java.lang.annotation.Target;
 @Component
 public @interface RpcAutowired {
     String version() default "";
+    boolean isAsync() default false;
 }

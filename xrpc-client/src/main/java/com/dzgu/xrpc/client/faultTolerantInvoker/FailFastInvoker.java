@@ -11,7 +11,7 @@ import com.dzgu.xrpc.dto.RpcResponse;
  */
 public class FailFastInvoker implements FaultTolerantInvoker {
     @Override
-    public RpcResponse<Object> doinvoke(NettyClient nettyClient, RpcMessage rpcMessage, String targetServiceUrl) {
-        return nettyClient.sendRequest(rpcMessage, targetServiceUrl);
+    public RpcResponse<Object> doinvoke(NettyClient nettyClient, RpcMessage rpcMessage, String targetServiceUrl,boolean isAsync) {
+        return nettyClient.sendRequest(rpcMessage, targetServiceUrl,isAsync);
     }
 }

@@ -1,10 +1,12 @@
 package com.dzgu.xrpc.register.nacos;
 
+import cn.hutool.core.collection.CollUtil;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.NamingService;
 import com.dzgu.xrpc.consts.enums.RpcErrorMessageEnum;
 import com.dzgu.xrpc.exception.RpcException;
 import com.dzgu.xrpc.register.Register;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
@@ -37,21 +39,20 @@ public class NacosRegister implements Register {
         NacosUtils.clearRegistry(namingService, inetSocketAddress);
     }
 
+    @SneakyThrows
     @Override
     public List<String> lookupService(String serviceKey) {
         // 从注册中心 拿到该rpcService下的所有server的Address
-        List<String> serviceUrlList = null;
-        try {
-            serviceUrlList = NacosUtils.getAllInstance(namingService, serviceKey);
-        } catch (NacosException e) {
+        List<String> serviceUrlList = NacosUtils.getAllInstance(namingService, serviceKey);
+
+        if (CollUtil.isEmpty(serviceUrlList)) {
             throw new RpcException(RpcErrorMessageEnum.SERVICE_CAN_NOT_BE_FOUND, serviceKey);
         }
-
         return serviceUrlList;
     }
 
     @Override
     public void stop() {
-        namingService=null;
+        namingService = null;
     }
 }

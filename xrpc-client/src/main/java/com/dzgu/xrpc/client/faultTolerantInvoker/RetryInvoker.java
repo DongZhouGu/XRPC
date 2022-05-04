@@ -23,10 +23,10 @@ public class RetryInvoker implements FaultTolerantInvoker {
 
 
     @Override
-    public RpcResponse<Object> doinvoke(NettyClient nettyClient, RpcMessage rpcMessage, String targetServiceUrl) {
+    public RpcResponse<Object> doinvoke(NettyClient nettyClient, RpcMessage rpcMessage, String targetServiceUrl,boolean isAsync) {
         for (int i = 0; i < DEFAULT_RETRY_TIMES; i++) {
             try {
-                RpcResponse<Object> result = nettyClient.sendRequest( rpcMessage, targetServiceUrl);
+                RpcResponse<Object> result = nettyClient.sendRequest( rpcMessage, targetServiceUrl,isAsync);
                 if (result != null) {
                     return result;
                 }

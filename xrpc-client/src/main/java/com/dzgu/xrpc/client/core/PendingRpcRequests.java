@@ -1,9 +1,9 @@
 package com.dzgu.xrpc.client.core;
 
+import com.dzgu.xrpc.client.async.RpcFuture;
 import com.dzgu.xrpc.dto.RpcResponse;
 
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -12,9 +12,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Date： 2022/4/25 22:01
  */
 public class PendingRpcRequests {
-    public static final Map<String, CompletableFuture<RpcResponse<Object>>> PENDING_RESPONSE_FUTURES = new ConcurrentHashMap<>();
+    public static final Map<String, RpcFuture> PENDING_RESPONSE_FUTURES = new ConcurrentHashMap<>();
 
-    public void put(String requestId, CompletableFuture<RpcResponse<Object>> future) {
+    public void put(String requestId, RpcFuture future) {
         PENDING_RESPONSE_FUTURES.put(requestId, future);
     }
 
@@ -28,7 +28,7 @@ public class PendingRpcRequests {
      * @param rpcResponse 收到服务端发来的调用结果
      */
     public void complete(RpcResponse<Object> rpcResponse) {
-        CompletableFuture<RpcResponse<Object>> future = PENDING_RESPONSE_FUTURES.remove(rpcResponse.getRequestId());
+        RpcFuture future = PENDING_RESPONSE_FUTURES.remove(rpcResponse.getRequestId());
         if (null != future) {
             future.complete(rpcResponse);
         } else {
