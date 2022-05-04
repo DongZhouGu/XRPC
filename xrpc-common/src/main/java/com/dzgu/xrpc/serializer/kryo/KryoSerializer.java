@@ -3,11 +3,11 @@ package com.dzgu.xrpc.serializer.kryo;
 import com.dzgu.xrpc.consts.enums.SerializerTypeEnum;
 import com.dzgu.xrpc.dto.RpcRequest;
 import com.dzgu.xrpc.dto.RpcResponse;
+import com.dzgu.xrpc.exception.SerializeException;
 import com.dzgu.xrpc.serializer.Serializer;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import com.sun.xml.internal.ws.encoding.soap.SerializationException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -40,7 +40,7 @@ public class KryoSerializer implements Serializer {
             kryoThreadLocal.remove();
             return output.toBytes();
         } catch (Exception e) {
-            throw new SerializationException("Kryo Serialization failed");
+            throw new SerializeException("Kryo Serialization failed",e.getMessage());
         }
     }
 
@@ -53,7 +53,8 @@ public class KryoSerializer implements Serializer {
             kryoThreadLocal.remove();
             return res;
         } catch (Exception e) {
-            throw new SerializationException("Kyro Deserialization failed");
+            throw new SerializeException("Kryo DeSerialization failed",e.getMessage());
+
         }
     }
 }

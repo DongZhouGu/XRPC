@@ -1,1 +1,3 @@
 random=com.dzgu.xrpc.client.loadbalance.loadbalancer.RandomLoadBalance
+full-round=com.dzgu.xrpc.client.loadbalance.loadbalancer.FullRoundBalance
+consistent-hash=com.dzgu.xrpc.client.loadbalance.loadbalancer.ConsistentHashLoadBalance

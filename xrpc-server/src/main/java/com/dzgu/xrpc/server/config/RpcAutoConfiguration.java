@@ -21,7 +21,7 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
 /**
- * @description:
+ * @description: 自动配置类
  * @Author： dzgu
  * @Date： 2022/5/2 11:24
  */
@@ -80,5 +80,4 @@ public class RpcAutoConfiguration implements DisposableBean {
     public void destroy() {
         nettyServer.stop();
     }
-
 }

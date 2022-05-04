@@ -3,8 +3,8 @@ package com.dzgu.xrpc.serializer.hessian;
 import com.caucho.hessian.io.HessianInput;
 import com.caucho.hessian.io.HessianOutput;
 import com.dzgu.xrpc.consts.enums.SerializerTypeEnum;
+import com.dzgu.xrpc.exception.SerializeException;
 import com.dzgu.xrpc.serializer.Serializer;
-import com.sun.xml.internal.ws.encoding.soap.SerializationException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -25,7 +25,7 @@ public class HessianSerializer implements Serializer {
             hessianOutput.writeObject(object);
             return byteArrayOutputStream.toByteArray();
         } catch (Exception e) {
-            throw new SerializationException("Hessian Serialization failed:", e.getMessage());
+            throw new SerializeException("Hessian Serialization failed:", e.getMessage());
         }
 
     }
@@ -37,7 +37,7 @@ public class HessianSerializer implements Serializer {
             Object o = hessianInput.readObject();
             return clazz.cast(o);
         } catch (Exception e) {
-            throw new SerializationException("Hessian Deserialization failed:", e.getMessage());
+            throw new SerializeException("Hessian Deserialization failed:", e.getMessage());
         }
     }
 }

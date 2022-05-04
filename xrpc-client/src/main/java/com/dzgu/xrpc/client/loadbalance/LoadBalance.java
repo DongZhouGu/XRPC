@@ -7,11 +7,11 @@ import com.dzgu.xrpc.extension.SPI;
 import java.util.List;
 
 /**
- * @description:
+ * @description: 负载均衡接口
  * @Author： dzgu
  * @Date： 2022/4/25 9:18
  */
-@SPI
+@SPI(value = "random")
 public interface LoadBalance {
     String doSelect(List<String> serviceAddresses, RpcRequest rpcRequest);
 
