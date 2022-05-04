@@ -189,11 +189,10 @@ public class ExtensionLoader<T> {
     private void loadDirectory(Map<String, Class<?>> extensionClasses) {
         // 扩展配置文件名
         String fileName = ExtensionLoader.SERVICE_DIRECTORY + type.getName();
-        // 拿到资源文件夹
-        ClassLoader classLoader = ExtensionLoader.class.getClassLoader();
-
         try {
-            Enumeration<URL> urls = classLoader.getResources(fileName);
+            Enumeration<URL> urls;
+            ClassLoader classLoader = this.getClass().getClassLoader();
+            urls = classLoader.getResources(fileName);
             if (urls != null) {
                 while (urls.hasMoreElements()) {
                     URL resourceUrl = urls.nextElement();

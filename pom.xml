@@ -33,6 +33,23 @@
         <hessian.version>4.0.65</hessian.version>
         <kryo.version>4.0.2</kryo.version>
     </properties>
+
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>dzgu</name>
+            <email>gdz1313@outlook.com</email>
+            <organization>dzgu</organization>
+            <organizationUrl>www.dzgu.top</organizationUrl>
+        </developer>
+    </developers>
+
     <dependencies>
         <!-- JUnit -->
         <dependency>
