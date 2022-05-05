@@ -1,7 +1,5 @@
 # 零、如何实现一个轻量级RPC框架？
 
-
-
 > 从零实现一个轻量级RPC框架-系列文章 
 > Github: [https://github.com/DongZhouGu/XRpc](https://github.com/DongZhouGu/XRpc) 
 
