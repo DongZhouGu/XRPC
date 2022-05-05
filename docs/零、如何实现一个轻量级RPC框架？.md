@@ -1,4 +1,4 @@
-> 从零实现一个轻量级RPC框架-系列文章
+> 从零实现一个轻量级RPC框架-系列文章 
 > Github: [https://github.com/DongZhouGu/XRpc](https://github.com/DongZhouGu/XRpc) 
 
 
@@ -155,24 +155,22 @@ public static void main(String[] args) {
 
 ### 实现要点
 
-- 使用基于Netty框架的NIO，自定义通信协议，解决TCP粘包/拆包，实现Channel复用、心跳保活
+- 基于NIO的Netty网络通讯，实现Channel复用、心跳保活
+- 自定义通信协议，增加Netty编解码器，解决TCP粘包/拆包问题。
+- 支持ProtoBuf、Kryo、Hessian2序列化，反序列化，经测试Kryo效率最高，默认Kyro
+- 支持Gzip压缩，可在配置文件配置是否启用包压缩，已经压缩算法，减少数据包的大小。
+- 支持Zookeeper和Nacos的服务注册发现，启动后将服务信息发布到注册中心，客户端发现并监听服务信息。
+- 客户端实现了基于轮询、随机和一致性哈希负载均衡算法，快速失败和重试的容错策略
+- 自定义RpcFuture，客户端支持同步和异步调用，设置回调方法，返回调用响应后执行回调。
+- 基于SPI的模块化管理，更加方便扩展模块，集成Spring通过注解注册服务，SpringBoot自动装载配置
 
-（对应系列文章：一、如何用Netty实现异步网络通信？ ）
+### 待优化点
 
-- 支持Kyro、Hessian、Protostuff多种序列化协议和gzip消息压缩方法，引入SPI扩展功能，Spring自定义配置（对应系列文章：二、网络传输高效序列化协议与实现 ）
-
-- 使用 Zookeeper 管理相关服务地址信息，实现服务注册与发现（对应系列文章：三、Zookeeper实现服务注册与发现）
-
-- 支持可配置的服务端代理模式，可选反射调用、字节码增强。（对应系列文章：四、采用动态代理去无感调用远程服务）
-- 支持客户端异步回调、负载均衡、集群容错等高级特性，集成Spring并制作starter发布 （对应系列文章：扩展：。。。）
-
-
-
-
-
-
-
-### 实现流程
+- 动态代理使用Javassist 生成代码，直接调用
+- 支持Eureka、Consul等注册中心
+- 调用鉴权、服务监控中心
+- 编写更完整的测试
+- ...
 
 
 
@@ -182,26 +180,3 @@ public static void main(String[] args) {
 
 
 
-
-
-![img](https://cdn.nlark.com/yuque/0/2022/png/1164521/1651156250260-edee5e6b-6f61-474f-8db3-e9d2c7122a59.png)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-![img](https://cdn.nlark.com/yuque/0/2022/png/1164521/1651147019248-72fa42e7-25d2-4500-aceb-273b0b9cbcf0.png)
-
-![img](https://cdn.nlark.com/yuque/0/2022/png/1164521/1651134156830-1cce2028-e93a-47d5-899c-51c846b84ca6.png)
-
-![img](https://cdn.nlark.com/yuque/0/2022/png/1164521/1651122574216-ac24d764-36ba-4abd-9b6a-0184f54deb8a.png)
