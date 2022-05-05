@@ -36,7 +36,7 @@ public class ProxyInjectProcessor implements ApplicationListener<ContextRefreshe
                         boolean isAsync = rpcAutowired.isAsync();
                         field.setAccessible(true);
                         try {
-                            field.set(bean, proxyFactory.getProxy(field.getType(), version,isAsync));
+                            field.set(bean, proxyFactory.getProxy(field.getType(), version, isAsync));
                         } catch (IllegalAccessException e) {
                             log.error("field.set error. bean={}, field={}", bean.getClass(), field.getName(), e);
                         }

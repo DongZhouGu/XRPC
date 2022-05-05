@@ -47,7 +47,7 @@ public class NettyServer {
         thread = new Thread(new Runnable() {
             DefaultEventExecutorGroup serviceHandlerGroup = new DefaultEventExecutorGroup(
                     RuntimeUtil.cpus() * 2,
-                    ThreadPoolFactoryUtil.createThreadFactory("com.dzgu.xprc.service-handler-group", false));
+                    ThreadPoolFactoryUtil.createThreadFactory("com.dzgu.xrpc.service-handler-group", false));
 
             @Override
             public void run() {
