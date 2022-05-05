@@ -1,3 +1,5 @@
+# 五、使用SPI实现可插拔扩展设计
+
 > 从零实现一个轻量级RPC框架-系列文章
 > Github: [https://github.com/DongZhouGu/XRpc](https://github.com/DongZhouGu/XRpc) 
 
@@ -314,7 +316,7 @@ public class AdaptiveInvocationHandler<T> implements InvocationHandler {
 1. 从方法参数中拿到 URL 参数，拿不到就直接执行方法
 1. 获取配置 Key。从 @Adaptive#value() 拿扩展名的配置 key，如果拿不到就直接执行方法
 1. 获取扩展名。判断配置 key 是不是协议，如果是就拿协议类型，否则拿 URL 后面的参数。
-例如 URL 是：zk://localhost:2181?type=eureka
+   例如 URL 是：zk://localhost:2181?type=eureka
    - 如果 @Adaptive("protocol")，那么扩展名就是协议类型：zk
    - 如果 @Adaptive("type")，那么扩展名就是type 参数：eureka
 4. 最后根据扩展名获取扩展 extensionLoader.getExtension(extendName)

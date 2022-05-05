@@ -1,3 +1,5 @@
+# 一、如何用Netty实现高性能网络通信？
+
 > 从零实现一个轻量级RPC框架-系列文章
 > Github: [https://github.com/DongZhouGu/XRpc](https://github.com/DongZhouGu/XRpc) 
 
@@ -512,12 +514,14 @@ public Object decode(ByteBuf in) {
 ```java
  new LengthFieldBasedFrameDecoder(maxFrameLength, lengthFieldOffset, lengthFieldLength, lengthAdjustment, initialBytesToStrip);
 ```
-maxFrameLength：指定包的最大长度，如果超过，直接丢弃
-lengthFieldOffset： 描述长度的字段在第几个字节
-lengthFieldLength：length 字段本身的长度(几个字节)
-lengthAdjustment：包的总长度调整，去掉lengthFieldOffset+lengthFieldLength
-initialBytesToStrip： 跳过的字节数，之前的几个参数，已经足够识别出整个数据包了。但是很多时候，调用者只关心包的内容，包的头部完全可以丢弃掉，initialBytesToStrip 就是用来告诉 Netty，识别出整个数据包之后，截掉 initialBytesToStrip之前的数据
-因此，这里我们的拆包参数为
+- maxFrameLength：指定包的最大长度，如果超过，直接丢弃
+- lengthFieldOffset： 描述长度的字段在第几个字节
+- lengthFieldLength：length 字段本身的长度(几个字节)
+- lengthAdjustment：包的总长度调整，去掉lengthFieldOffset+lengthFieldLength
+- initialBytesToStrip： 跳过的字节数，之前的几个参数，已经足够识别出整个数据包了。但是很多时候，调用者只关心包的内容，包的头部完全可以丢弃掉
+- initialBytesToStrip 就是用来告诉 Netty，识别出整个数据包之后，截掉 initialBytesToStrip之前的数据
+  因此，这里我们的拆包参数为
+
 ```java
  new LengthFieldBasedFrameDecoder(RpcConstants.MAX_FRAME_LENGTH, 5, 4, -9, 0);
 ```
@@ -883,8 +887,6 @@ protected void channelRead0(ChannelHandlerContext channelHandlerContext, RpcMess
 
 /**
  * @description: 未收到回复的请求
- * @Author： dzgu
- * @Date： 2022/4/25 22:01
  */
 public class PendingRpcRequests {
     public static final Map<String, CompletableFuture<RpcResponse<Object>>> PENDING_RESPONSE_FUTURES = new ConcurrentHashMap<>();
