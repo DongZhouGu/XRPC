@@ -1,7 +1,21 @@
 xrpc:
+  # 是否启用rpc，默认启用
   enable: true
+  # RPC服务端口
   serverPort: 18866
-  register: nacos
-  registerAddress: 106.14.145.23:8848
+  #  注册中心，默认zookeeper
+  register: zookeeper
+  # 注册中心地址
+  registerAddress: 127.0.01:8848
+  # 序列化算没法，默认kryo
+  serializer: kryo
+  # 压缩算法，默认gzip
+  compress: gzip
+  # 负载均衡算法，默认random
+  load-balance: random
+  # 容错策略，默认retry
+  retry: retry
+  # 重试次数，只有容错策略是retry时才有效
+  retry-times: 3
 server:
   port: 8082
