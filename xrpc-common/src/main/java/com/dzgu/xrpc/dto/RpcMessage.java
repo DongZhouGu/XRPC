@@ -2,6 +2,8 @@ package com.dzgu.xrpc.dto;
 
 import lombok.*;
 
+import java.io.Serializable;
+
 /**
  * @description: 消息头+消息体
  * @Author： dzgu
@@ -13,7 +15,8 @@ import lombok.*;
 @Setter
 @Builder
 @ToString
-public class RpcMessage {
+@Data
+public class RpcMessage implements Serializable {
     /**
      * rpc message type
      */

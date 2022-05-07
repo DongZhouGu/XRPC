@@ -16,6 +16,7 @@ import java.io.Serializable;
 @Setter
 @Builder
 @ToString
+@Data
 public class RpcResponse<T> implements Serializable {
     private static final long serialVersionUID = 715745410605631233L;
     private String requestId;

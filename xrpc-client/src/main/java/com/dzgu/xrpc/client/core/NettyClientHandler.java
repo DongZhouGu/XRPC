@@ -42,7 +42,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<RpcMessage> 
         log.info("client receive msg: [{}]", rpcMessage);
         byte messageType = rpcMessage.getMessageType();
         if (messageType == RpcConstants.HEARTBEAT_RESPONSE_TYPE) {
-            log.info("heart receive[{}]", rpcMessage.getData());
+            log.debug("heart receive[{}]", rpcMessage.getData());
         } else if (messageType == RpcConstants.RESPONSE_TYPE) {
             RpcResponse<Object> rpcResponse = (RpcResponse<Object>) rpcMessage.getData();
             // 调用结果响应 绑定到对应的请求
@@ -58,7 +58,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<RpcMessage> 
         if (evt instanceof IdleStateEvent) {
             IdleState state = ((IdleStateEvent) evt).state();
             if (state == IdleState.WRITER_IDLE) {
-                log.info("write idle happen [{}]", ctx.channel().remoteAddress());
+                log.debug("write idle happen [{}]", ctx.channel().remoteAddress());
                 RpcMessage rpcMessage = new RpcMessage();
                 rpcMessage.setCodec(SerializerTypeEnum.PROTOSTUFF.getCode());
                 rpcMessage.setCompress(CompressTypeEnum.GZIP.getCode());

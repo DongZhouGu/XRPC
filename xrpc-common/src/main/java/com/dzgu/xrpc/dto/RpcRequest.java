@@ -1,7 +1,6 @@
 package com.dzgu.xrpc.dto;
 
 import lombok.*;
-import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 
@@ -15,6 +14,7 @@ import java.io.Serializable;
 @Getter
 @Builder
 @ToString
+@Data
 public class RpcRequest implements Serializable {
     private static final long serialVersionUID = 2176648719840392878L;
     private String requestId;

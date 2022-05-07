@@ -3,7 +3,8 @@
 /xrpc-common/target/
 /xprc-server/target/
 /xrpc-test-server/target/
-/logs/
 /.idea/
 /xrpc-server/target/
 /xrpc-test-client/logs/
+/logs_client/
+/logs_server/

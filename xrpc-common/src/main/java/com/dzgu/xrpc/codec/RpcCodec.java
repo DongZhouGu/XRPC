@@ -104,7 +104,7 @@ public class RpcCodec {
             // 1B codec（序列化类型）
             out.writeByte(rpcMessage.getCodec());
             // 1B compress（压缩类型）
-            out.writeByte(CompressTypeEnum.GZIP.getCode());
+            out.writeByte(rpcMessage.getCompress());
             // 4B requestId（请求的Id）
             out.writeInt(rpcMessage.getRequestId());
             // 写body，并获取数据长度

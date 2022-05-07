@@ -50,15 +50,19 @@ public class Spliter extends LengthFieldBasedFrameDecoder {
     @Override
     protected Object decode(ChannelHandlerContext ctx, ByteBuf in) throws Exception {
         Object decoded = super.decode(ctx, in);
-        ByteBuf frame = (ByteBuf) decoded;
-        if (frame.readableBytes() >= RpcConstants.HEAD_LENGTH) {
-            //拒绝非本协议连接
-            if(!checkMagicNumberAndVersion(frame)){
-                ctx.channel().close();
-                return null;
+        if (decoded instanceof ByteBuf) {
+            ByteBuf frame = (ByteBuf) decoded;
+            if (frame.readableBytes() >= RpcConstants.HEAD_LENGTH) {
+                //拒绝非本协议连接
+                if(!checkMagicNumberAndVersion(frame)){
+                    ctx.channel().close();
+                    return null;
+                }
             }
         }
         return decoded;
+
+
     }
 
     /**

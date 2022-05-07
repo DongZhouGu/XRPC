@@ -113,7 +113,7 @@ public class ProxyFactory {
             ;
             // 负载均衡
             String targetServiceUrl = loadBalance.selectServiceAddress(serviceUrlList, rpcRequest);
-            log.info("Successfully found the com.dzgu.xprc.service address:[{}]", targetServiceUrl);
+            log.debug("Successfully found the com.dzgu.xprc.service address:[{}]", targetServiceUrl);
             //封装Message
             RpcMessage rpcMessage = RpcMessage.builder()
                     .data(rpcRequest)

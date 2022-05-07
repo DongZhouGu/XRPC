@@ -1,6 +1,5 @@
 package com.dzgu.xrpc.consts.enums;
 
-import com.dzgu.xrpc.properties.RpcConfig;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -21,12 +20,13 @@ public enum SerializerTypeEnum {
 
     public static byte getCode(String name) {
         for (SerializerTypeEnum c : SerializerTypeEnum.values()) {
-            if (c.getName() == name) {
+            if (c.getName().equals(name)) {
                 return c.code;
             }
         }
         return HESSIAN.getCode();
     }
+
     public static String getName(byte code) {
         for (SerializerTypeEnum c : SerializerTypeEnum.values()) {
             if (c.getCode() == code) {

@@ -43,7 +43,7 @@
 
 [七、集成Spring与SpringBoot](https://dongzhougu.github.io/XRPC/#/./七、集成Spring与SpringBoot?id=七、集成spring与springboot)
 
-
+[八、项目性能测试](https://dongzhougu.github.io/XRPC#/./八，项目性能测试?id=八、项目性能测试)
 
 ## 🔨 实现要点
 
